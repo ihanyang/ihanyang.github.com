@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<title>路再长，也长不过我35码半的脚步</title>
+<link rel="shortcut icon" href="http://hanyang.me/images/favicon.ico" />
+<style>
+body, div {
+	padding: 0;
+	margin: 0;
+	font-family: "Microsoft YaHei";
+}
+.wrap {
+	width: 180px;
+	height: 120px;
+	position: absolute;
+	top: 40%;
+	left: 43%;
+	perspective: 1000px;
+	-webkit-perspective: 1000px;
+}
+.content {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	transition: all 0.7s ease-in-out;
+	transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
+}
+.card {
+	display: block;
+	position: absolute;
+	width: 180px;
+	height: 120px;
+	left: 10px;
+	top: 10px;
+	line-height: 120px;
+	font-size: 40px;
+	text-align: center;
+	background-color: #F14382;
+	transition: all 1.3s ease;
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+	-webkit-box-reflect: below 0 linear-gradient(transparent 60%,rgba(0, 0, 0, 0.3));
+}
+</style>
+<script>
+window.onload = function () {
+	var content = document.querySelector(".content"),
+		card = document.querySelectorAll(".card"),
+		i,
+		length = card.length,
+		k = 0,
+		time = setInterval(function () {
+			if (k >= length) {
+				clearInterval(time);
+			} else {
+				card[k].style["transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
+				card[k].style["-webkit-transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
+				k++;
+			}
+		}, 33),
+		j = 1,
+		timer = setInterval(function () {
+			var r = Math.round(Math.random() * 255),
+				g = Math.round(Math.random() * 255),
+				b = Math.round(Math.random() * 255);
+			for (i = 0; i < length; i++) {
+				card[i].style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
+			}
+			content.style["transform"] = "rotateY(" + j * -40 + "deg)";
+			content.style["-webkit-transform"] = "rotateY(" + j * -40 + "deg)";
+			j++;
+		}, 3000);
+};
+</script>
+</head>
+
+<body>
+	<div class="wrap">
+		<div class="content">
+			<div class="card">1</div>
+			<div class="card">2</div>
+			<div class="card">3</div>
+			<div class="card">4</div>
+			<div class="card">5</div>
+			<div class="card">6</div>
+			<div class="card">7</div>
+			<div class="card">8</div>
+			<div class="card">9</div>
+		</div>
+	</div>
+</body>
+</html>
