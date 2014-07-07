@@ -51,16 +51,16 @@ window.onload = function () {
 		card = document.querySelectorAll(".card"),
 		i,
 		length = card.length,
-		k = 0,
+		k = 8,
 		time = setInterval(function () {
 			if (k >= length) {
 				clearInterval(time);
 			} else {
 				card[k].style["transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
 				card[k].style["-webkit-transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
-				k++;
+				k--;
 			}
-		}, 33),
+		}, 200),
 		j = 1,
 		timer = setInterval(function () {
 			var r = Math.round(Math.random() * 255),
@@ -72,7 +72,7 @@ window.onload = function () {
 			content.style["transform"] = "translateZ(-288px) rotateY(" + j * -40 + "deg)";
 			content.style["-webkit-transform"] = "rotateY(" + j * -40 + "deg)";
 			j++;
-		}, 3000);
+		}, 3300);
 };
 </script>
 </head>
