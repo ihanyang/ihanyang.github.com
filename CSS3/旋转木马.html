@@ -9,7 +9,7 @@
 body, div {
 	padding: 0;
 	margin: 0;
-	font-family: "Microsoft YaHei"
+	font-family: "Microsoft YaHei";
 }
 .wrap {
 	width: 180px;
@@ -24,7 +24,7 @@ body, div {
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	transition: all 0.8s ease-in-out;
+	transition: all 0.7s ease-in-out;
 	transform-style: preserve-3d;
 	-webkit-transform-style: preserve-3d;
 }
@@ -39,7 +39,7 @@ body, div {
 	font-size: 40px;
 	text-align: center;
 	background-color: #F14382;
-	transition: all 1.3s ease-in;
+	transition: all 1.3s ease;
 	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
 	-webkit-box-reflect: below 0 linear-gradient(transparent 60%,rgba(0, 0, 0, 0.3));
 }
@@ -50,6 +50,16 @@ window.onload = function () {
 		card = document.querySelectorAll(".card"),
 		i,
 		length = card.length,
+		k = 0,
+		time = setInterval(function () {
+			if (k >= length) {
+				clearInterval(time);
+			} else {
+				card[k].style["transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
+				card[k].style["-webkit-transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
+				k++;
+			}
+		}, 33),
 		j = 1,
 		timer = setInterval(function () {
 			var r = Math.round(Math.random() * 255),
@@ -62,10 +72,6 @@ window.onload = function () {
 			content.style["-webkit-transform"] = "rotateY(" + j * -40 + "deg)";
 			j++;
 		}, 3000);
-	for (i = 0; i < length; i++) {
-		card[i].style["transform"] = "rotateY(" + i * 40 + "deg) translateZ(288px)";
-		card[i].style["-webkit-transform"] = "rotateY(" + i * 40 + "deg) translateZ(288px)";
-	}
 };
 </script>
 </head>
