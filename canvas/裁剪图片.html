@@ -13,6 +13,7 @@ body, div {
 }
 .wrap {
 	width: 500px;
+	height: 700px;
 	margin: 5% 0 0 20%;
 	position: relative;
 	border: 2px solid #BB44C2;
@@ -23,14 +24,22 @@ body, div {
 	position: absolute;
 	top: 0;
 	cursor: move;
-	box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 	background-color: rgba(255, 255, 255, 0.3);
+}
+.show {
+	position: absolute;
+	top: 11%;
+	right: 25%;
+	background-color: green;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
 }
 </style>
 <script>
 window.onload = function () {
-	var c = document.querySelector("canvas"),
+	var c = document.querySelectorAll("canvas")[0],
 		cc = c.getContext("2d"),
+		show = document.querySelectorAll("canvas")[1].getContext("2d"),
 		move = document.querySelector(".move"),
 		getStyle = function (obj, name) {
 			if (parseInt(obj.style.name)) {
@@ -43,16 +52,21 @@ window.onload = function () {
 				}
 			}
 		},
+		imgData,
+		x,
+		y,
+		l,
+		t,
 		img = new Image();
-	img.src = "http://www.iyi8.com/uploadfile/2014/0422/20140422010747515.jpg";
+	img.src = "nv.jpg"; //"http://www.iyi8.com/uploadfile/2014/0422/20140422011447558.jpg";
 	cc.drawImage(img, 0, 0);
 
 	move.onmousedown = function (e) {
-		var x = e.clientX - getStyle(this, "left"),
-			y = e.clientY - getStyle(this, "top");
+		x = e.clientX - getStyle(this, "left");
+		y = e.clientY - getStyle(this, "top");
 		document.onmousemove = function (e) {
-			var t = e.clientY - y,
-				l = e.clientX - x;
+			t = e.clientY - y;
+			l = e.clientX - x;
 			if (t < 0) {
 				t = 0;
 			} else if (t > c.height - 150) {
@@ -65,6 +79,8 @@ window.onload = function () {
 			}
 			move.style.top = t + "px";
 			move.style.left = l + "px";
+			imgData = cc.getImageData(l, t, 150, 150);
+			show.putImageData(imgData, 0, 0);
 		};
 	};
 	document.onmouseup = function (e) {
@@ -80,6 +96,6 @@ window.onload = function () {
 		<canvas width="500" height="700">悠哉悠哉，辗转反侧</canvas>
 		<div class="move"></div>
 	</div>
-	<div class="show"></div>
+	<canvas class="show" width="150" height="150"></canvas>
 </body>
 </html>
