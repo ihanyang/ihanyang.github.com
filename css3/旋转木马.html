@@ -30,10 +30,9 @@ body, div {
 	-webkit-transform-style: preserve-3d;
 }
 .card {
-	display: block;
-	position: absolute;
 	width: 180px;
 	height: 120px;
+	position: absolute;
 	left: 10px;
 	top: 10px;
 	line-height: 120px;
@@ -53,7 +52,7 @@ window.onload = function () {
 		length = card.length,
 		k = 8,
 		time = setInterval(function () {
-			if (k >= length) {
+			if (k < 0) {
 				clearInterval(time);
 			} else {
 				card[k].style["transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
