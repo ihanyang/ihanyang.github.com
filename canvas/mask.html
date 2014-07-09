@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<title>路再长，也长不过我35码半的脚步</title>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<style>
+body, div, h5, h6, p {
+	padding: 0;
+	margin: 0;
+	font-family: "Microsoft YaHei";
+}
+.wrap {
+	width: 386px;
+	height: 217px;
+	margin-left: -193px;
+	position: absolute;
+	top: 30%;
+	left: 50%;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+}
+.top {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	border: 1px solid green;
+}
+</style>
+<script>
+window.onload = function () {
+	var c = document.querySelector(".bottom"),
+		cc = c.getContext("2d"),
+		cTop = document.querySelector(".top"),
+		ccTop = cTop.getContext("2d"),
+		img = new Image(),
+		getStyle = function (obj, name) {
+			if (parseInt(obj.style.name)) {
+				return parseInt(obj.style.name);
+			} else {
+				if (obj.currentStyle) {
+					return parseInt(obj.currentStyle[name]);
+				} else {
+					return parseInt(getComputedStyle(obj, false)[name]);
+				}
+			}
+		},
+		w = 100,
+		h = 100;
+
+	img.src = "a.gif";
+	cc.drawImage(img, 0, 0);
+	cc.fillStyle = "rgba(0, 0, 0, 0.5)";
+	cc.fillRect(0, 0, 386, 217);
+
+	ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
+
+
+
+	cTop.onmousedown = function (e) {
+		x = e.clientX - getStyle(this, "left");
+		y = e.clientY - getStyle(this, "top");
+		document.onmousemove = function (e) {
+			t = e.clientY - y;
+			l = e.clientX - x;
+			if (t < 0) {
+				t = 0;
+			} else if (t > 217 - 100) {
+				t = 217 - 100;
+			}
+			if (l < 0) {
+				l = 0;
+			} else if (l > 386 - 100) {
+				l = 386 - 100;
+			}
+			cTop.style.top = t + "px";
+			cTop.style.left = l + "px";
+			//imgData = cc.getImageData(l, t, 60, 60);
+			//showMin.putImageData(imgData, 0, 0);
+
+			//moveWrapC.putImageData(ccc, l, t);
+			//moveWrapC.clearRect(l, t, 280, 280);
+			w = l;
+			h = t;
+			ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
+			
+		};
+	};
+	document.onmouseup = function (e) {
+		document.onmousemove = null;
+	};
+
+};
+</script>
+</head>
+
+<body>
+	<div class="wrap">
+		<canvas class="bottom" width="386" height="217"></canvas>
+		<canvas class="top" width="100" height="100"></canvas>
+	</div>
+</body>
+</html>
