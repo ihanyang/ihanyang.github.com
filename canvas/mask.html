@@ -6,25 +6,63 @@
 <title>路再长，也长不过我35码半的脚步</title>
 <link rel="shortcut icon" href="../images/favicon.ico" />
 <style>
-body, div, h5, h6, p {
+body, div, h5, h6, p, canvas {
 	padding: 0;
 	margin: 0;
 	font-family: "Microsoft YaHei";
 }
 .wrap {
-	width: 386px;
-	height: 217px;
-	margin-left: -193px;
+	width: 600px;
+	height: 300px;
+	margin-left: -300px;
 	position: absolute;
 	top: 30%;
 	left: 50%;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
 }
-.top {
+.clip {
+	width: 120px;
+	height: 120px;
 	position: absolute;
 	top: 100px;
-	left: 100px;
-	border: 1px solid green;
+	left: 250px;
+	border: 2px solid green;
+}
+.rightBottom {
+	width: 5px;
+	height: 5px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+	background-color: red;
+}
+.div, .gray {
+	width: 120px;
+	height: 120px;
+	margin-left: -50px;
+	position: absolute;
+	top: 5%;
+	left:35%;
+	border: 2px solid green;
+}
+.gray {
+	left: 60%;
+}
+.div img {
+	width: 120px;
+	height: 120px;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.gray img {
+	width: 120px;
+	height: 120px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
 }
 </style>
 <script>
@@ -33,6 +71,13 @@ window.onload = function () {
 		cc = c.getContext("2d"),
 		cTop = document.querySelector(".top"),
 		ccTop = cTop.getContext("2d"),
+		cGray = document.querySelector(".cGray"),
+		ccGray = cGray.getContext("2d"),
+		div = document.querySelector(".div"),
+		gray = document.querySelector(".gray"),
+		clip = document.querySelector(".clip"),
+		input = document.querySelector("input"),
+		rightBottom = document.querySelector(".rightBottom"),
 		img = new Image(),
 		getStyle = function (obj, name) {
 			if (parseInt(obj.style.name)) {
@@ -45,36 +90,83 @@ window.onload = function () {
 				}
 			}
 		},
-		w = 100,
-		h = 100;
+		w = 250,
+		h = 100,
+		i,
+		red,
+		green,
+		blue,
+		data,
+		len,
+		average,
+		imgData;
 
-	img.src = "a.gif";
-	cc.drawImage(img, 0, 0);
+
+
+
+	input.onchange = function () {
+		var reader = new FileReader();
+		reader.readAsDataURL(input.files[0]);
+		reader.onload = function () {
+			img.src = reader.result;
+			//img.src = "a.jpg";
+	//var timer = setInterval(function () {
+		cc.drawImage(img, 0, 0, 600, 300);
+	//}, 20);
+	imgData = cc.getImageData(0, 0, 600, 300);
 	cc.fillStyle = "rgba(0, 0, 0, 0.5)";
-	cc.fillRect(0, 0, 386, 217);
+	cc.fillRect(0, 0, 600, 300);
 
-	ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
+	//ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
+	ccTop.putImageData(imgData, -250, -100);
+
+	var imgDiv = new Image();
+	imgDiv.src = cTop.toDataURL("image/png");
+	div.appendChild(imgDiv);
+
+	var imgGray = new Image();
+	imgGray.src = cTop.toDataURL("image/png");
+	gray.appendChild(imgGray);
+	ccGray.drawImage(imgGray, 0, 0);
+
+	var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
+	data = imgDataGray.data;
+	len = data.length;
+	// 反转颜色
+	for (i = 0; i < len; i+=4) {
+		red = data[i];
+		green = data[i + 1];
+		blue = data[i + 2];
+		average = Math.floor((red + green + blue) / 3);
+		data[i] = average;
+		data[i+1] = average;
+		data[i+2] = average;
+  	}
+  	imgDataGray.data = data;
+	ccGray.putImageData(imgDataGray, 0, 0);
 
 
 
-	cTop.onmousedown = function (e) {
-		x = e.clientX - getStyle(this, "left");
-		y = e.clientY - getStyle(this, "top");
+	clip.onmousedown = function (e) {
+		var x = e.clientX - getStyle(this, "left");
+		var y = e.clientY - getStyle(this, "top");
 		document.onmousemove = function (e) {
-			t = e.clientY - y;
-			l = e.clientX - x;
+			var t = e.clientY - y;
+			var l = e.clientX - x;
 			if (t < 0) {
 				t = 0;
-			} else if (t > 217 - 100) {
-				t = 217 - 100;
+			} else if (t > c.height - cTop.height) {
+				t = c.height - cTop.height;
 			}
 			if (l < 0) {
 				l = 0;
-			} else if (l > 386 - 100) {
-				l = 386 - 100;
+			} else if (l > c.width - cTop.width) {
+				l = c.width - cTop.width;
 			}
-			cTop.style.top = t + "px";
-			cTop.style.left = l + "px";
+			t = parseInt(t);
+			l = parseInt(l);
+			clip.style.top = t + "px";
+			clip.style.left = l + "px";
 			//imgData = cc.getImageData(l, t, 60, 60);
 			//showMin.putImageData(imgData, 0, 0);
 
@@ -82,13 +174,96 @@ window.onload = function () {
 			//moveWrapC.clearRect(l, t, 280, 280);
 			w = l;
 			h = t;
-			ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
+			//ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
+
+			ccTop.putImageData(imgData, -l, -t);
+			imgDiv.src = cTop.toDataURL("image/png");
+
+			imgGray.src = cTop.toDataURL("image/png");
+			ccGray.drawImage(imgGray, 0, 0);
+
+			var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
+			data = imgDataGray.data;
+			len = data.length;
+			// 反转颜色
+			for (i = 0; i < len; i+=4) {
+				red = data[i];
+				green = data[i + 1];
+				blue = data[i + 2];
+				average = Math.floor((red + green + blue) / 3);
+				data[i] = average;
+				data[i+1] = average;
+				data[i+2] = average;
+		  	}
+		  	imgDataGray.data = data;
+			ccGray.putImageData(imgDataGray, 0, 0);
+
 			
 		};
 	};
-	document.onmouseup = function (e) {
+	/*document.onmouseup = function () {
+		document.onmousemove = null;
+	};*/
+
+
+	/*cTop.onmouseover = function (e) {
+		var x = this.parentNode.offsetLeft;
+		var y = this.parentNode.offsetTop;
+		var xx = parseInt((x + this.width + getStyle(this, "left")) - e.clientX);
+		var yy = parseInt((x + this.height + getStyle(this, "top")) - e.clientY);
+		if (xx >= -1 && yy <= 65) {
+			//alert(xx);
+			this.style.cursor = "se-resize";
+		}
+	};*/
+
+	var rx;
+	var ry;
+	rightBottom.onmousedown = function (ev) {
+		rx = this.parentNode.parentNode.offsetLeft + getStyle(this.parentNode, "left");
+		ry = this.parentNode.parentNode.offsetTop + getStyle(this.parentNode, "top");
+		//alert(rx);
+		document.onmousemove = function (e) {
+		//alert(e.clientX);
+			rightBottom.parentNode.style.width = parseInt(Math.abs(e.clientX - rx)) + "px";
+			rightBottom.parentNode.style.height = parseInt(Math.abs(e.clientY - ry)) + "px";
+			cTop.width = parseInt(Math.abs(e.clientX - rx));
+			cTop.height = parseInt(Math.abs(e.clientY - ry));
+			ccTop.putImageData(imgData, -w, -h);
+			imgDiv.src = cTop.toDataURL("image/png");
+
+			imgGray.src = cTop.toDataURL("image/png");
+			ccGray.drawImage(imgGray, 0, 0);
+
+			var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
+			data = imgDataGray.data;
+			len = data.length;
+			// 反转颜色
+			for (i = 0; i < len; i+=4) {
+				red = data[i];
+				green = data[i + 1];
+				blue = data[i + 2];
+				average = Math.floor((red + green + blue) / 3);
+				data[i] = average;
+				data[i+1] = average;
+				data[i+2] = average;
+		  	}
+		  	imgDataGray.data = data;
+			ccGray.putImageData(imgDataGray, 0, 0);
+			
+			//show.style["transform"] = "scale(" + show.width/50 + ")";
+		};
+		ev.stopPropagation();
+	};
+	
+	document.onmouseup = function () {
 		document.onmousemove = null;
 	};
+		};
+	};
+
+
+	
 
 };
 </script>
@@ -96,8 +271,16 @@ window.onload = function () {
 
 <body>
 	<div class="wrap">
-		<canvas class="bottom" width="386" height="217"></canvas>
-		<canvas class="top" width="100" height="100"></canvas>
+		<canvas class="bottom" width="600" height="300"></canvas>
+		<div class="clip">
+			<canvas class="top" width="120" height="120"></canvas>
+			<div class="rightBottom"></div>
+		</div>
 	</div>
+	<div class="div"></div>
+	<div class="gray">
+		<canvas class="cGray" width="120" height="120"></canvas>
+	</div>
+	<input type="file" accept="image/*"/>
 </body>
 </html>
