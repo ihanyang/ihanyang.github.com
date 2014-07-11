@@ -12,7 +12,6 @@ body, div, h5, h6, p, canvas {
 	font-family: "Microsoft YaHei";
 }
 .wrap {
-	width: 600px;
 	height: 300px;
 	margin-left: -300px;
 	position: absolute;
@@ -62,12 +61,15 @@ body, div, h5, h6, p, canvas {
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: -1;
+}
+.gray canvas {
+	opacity: 0;
 }
 </style>
 <script>
 window.onload = function () {
-	var c = document.querySelector(".bottom"),
+	var wrap = document.querySelector(".wrap"),
+		c = document.querySelector(".bottom"),
 		cc = c.getContext("2d"),
 		cTop = document.querySelector(".top"),
 		ccTop = cTop.getContext("2d"),
@@ -109,13 +111,16 @@ window.onload = function () {
 		reader.readAsDataURL(input.files[0]);
 		reader.onload = function () {
 			img.src = reader.result;
+			//img.height = 300;
+			c.width = (img.width * 300) /img.height;
+			wrap.style.width = (img.width * 300) /img.height + "px";
 			//img.src = "a.jpg";
 	//var timer = setInterval(function () {
-		cc.drawImage(img, 0, 0, 600, 300);
+		cc.drawImage(img, 0, 0, c.width, 300);
 	//}, 20);
-	imgData = cc.getImageData(0, 0, 600, 300);
+	imgData = cc.getImageData(0, 0, c.width, 300);
 	cc.fillStyle = "rgba(0, 0, 0, 0.5)";
-	cc.fillRect(0, 0, 600, 300);
+	cc.fillRect(0, 0, c.width, 300);
 
 	//ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
 	ccTop.putImageData(imgData, -250, -100);
@@ -125,9 +130,7 @@ window.onload = function () {
 	div.appendChild(imgDiv);
 
 	var imgGray = new Image();
-	imgGray.src = cTop.toDataURL("image/png");
-	gray.appendChild(imgGray);
-	ccGray.drawImage(imgGray, 0, 0);
+	ccGray.drawImage(imgDiv, 0, 0);
 
 	var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
 	data = imgDataGray.data;
@@ -144,6 +147,8 @@ window.onload = function () {
   	}
   	imgDataGray.data = data;
 	ccGray.putImageData(imgDataGray, 0, 0);
+	imgGray.src = cGray.toDataURL("image/png");
+	gray.appendChild(imgGray);
 
 
 
@@ -179,8 +184,8 @@ window.onload = function () {
 			ccTop.putImageData(imgData, -l, -t);
 			imgDiv.src = cTop.toDataURL("image/png");
 
-			imgGray.src = cTop.toDataURL("image/png");
-			ccGray.drawImage(imgGray, 0, 0);
+			//imgGray.src = cTop.toDataURL("image/png");
+			ccGray.drawImage(imgDiv, 0, 0);
 
 			var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
 			data = imgDataGray.data;
@@ -197,6 +202,8 @@ window.onload = function () {
 		  	}
 		  	imgDataGray.data = data;
 			ccGray.putImageData(imgDataGray, 0, 0);
+			imgGray.src = cGray.toDataURL("image/png");
+
 
 			
 		};
@@ -227,13 +234,13 @@ window.onload = function () {
 		//alert(e.clientX);
 			rightBottom.parentNode.style.width = parseInt(Math.abs(e.clientX - rx)) + "px";
 			rightBottom.parentNode.style.height = parseInt(Math.abs(e.clientY - ry)) + "px";
-			cTop.width = parseInt(Math.abs(e.clientX - rx));
-			cTop.height = parseInt(Math.abs(e.clientY - ry));
+			cGray.width = cTop.width = parseInt(Math.abs(e.clientX - rx));
+			cGray.height = cTop.height = parseInt(Math.abs(e.clientY - ry));
 			ccTop.putImageData(imgData, -w, -h);
 			imgDiv.src = cTop.toDataURL("image/png");
 
-			imgGray.src = cTop.toDataURL("image/png");
-			ccGray.drawImage(imgGray, 0, 0);
+			//imgGray.src = cTop.toDataURL("image/png");
+			ccGray.drawImage(imgDiv, 0, 0);
 
 			var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
 			data = imgDataGray.data;
@@ -250,6 +257,7 @@ window.onload = function () {
 		  	}
 		  	imgDataGray.data = data;
 			ccGray.putImageData(imgDataGray, 0, 0);
+			imgGray.src = cGray.toDataURL("image/png");
 			
 			//show.style["transform"] = "scale(" + show.width/50 + ")";
 		};
@@ -271,7 +279,7 @@ window.onload = function () {
 
 <body>
 	<div class="wrap">
-		<canvas class="bottom" width="600" height="300"></canvas>
+		<canvas class="bottom" height="300"></canvas>
 		<div class="clip">
 			<canvas class="top" width="120" height="120"></canvas>
 			<div class="rightBottom"></div>
