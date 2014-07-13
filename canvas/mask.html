@@ -12,19 +12,20 @@ body, div, h5, h6, p, canvas {
 	font-family: "Microsoft YaHei";
 }
 .wrap {
+	width: 600px;
 	height: 300px;
 	margin-left: -300px;
 	position: absolute;
 	top: 30%;
 	left: 50%;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 .clip {
 	width: 120px;
 	height: 120px;
 	position: absolute;
-	top: 100px;
-	left: 250px;
+	top: 90px;
+	left: 240px;
 	border: 2px solid green;
 }
 .rightBottom {
@@ -41,12 +42,12 @@ body, div, h5, h6, p, canvas {
 	height: 120px;
 	margin-left: -50px;
 	position: absolute;
-	top: 5%;
-	left:35%;
+	top: 28%;
+	left: 80%;
 	border: 2px solid green;
 }
 .gray {
-	left: 60%;
+	top: 58%;
 }
 .div img {
 	width: 120px;
@@ -64,6 +65,24 @@ body, div, h5, h6, p, canvas {
 }
 .gray canvas {
 	opacity: 0;
+}
+.label {
+	width: 130px;
+	height: 30px;
+	position: absolute;
+	top: 30%;
+	left: 10%;
+	line-height: 30px;
+	text-align: center;
+	background-color: #F4F4F4;
+	transition: all 0.3s ease;
+	box-shadow: 0 0 1px rgba(0, 0, 0, 0.7);
+}
+.label:hover {
+	background-color: #C3E6FF;
+}
+input {
+	display: none;
 }
 </style>
 <script>
@@ -114,6 +133,10 @@ window.onload = function () {
 			//img.height = 300;
 			c.width = (img.width * 300) /img.height;
 			wrap.style.width = (img.width * 300) /img.height + "px";
+			cGray.width = cGray.height = cTop.width = cTop.height = 120;
+			clip.style.width = clip.style.height = "120px";
+			clip.style.top = (parseInt(wrap.style.height) - 120) / 2 + "px";
+			clip.style.left = (parseInt(wrap.style.width) - 120) / 2 + "px";
 			//img.src = "a.jpg";
 	//var timer = setInterval(function () {
 		cc.drawImage(img, 0, 0, c.width, 300);
@@ -123,7 +146,7 @@ window.onload = function () {
 	cc.fillRect(0, 0, c.width, 300);
 
 	//ccTop.drawImage(img, w, h, 100, 100, 0, 0, 100, 100);
-	ccTop.putImageData(imgData, -250, -100);
+	ccTop.putImageData(imgData, -getStyle(clip, "left"), -getStyle(clip, "top"));
 
 	var imgDiv = new Image();
 	imgDiv.src = cTop.toDataURL("image/png");
@@ -232,6 +255,9 @@ window.onload = function () {
 		//alert(rx);
 		document.onmousemove = function (e) {
 		//alert(e.clientX);
+			if (parseInt(Math.abs(e.clientX - rx)) + getStyle(clip, "left") >= getStyle(wrap, "width") || parseInt(Math.abs(e.clientY - ry)) + getStyle(clip, "top") >= getStyle(wrap, "height")) {
+				document.onmousemove = null;
+			}
 			rightBottom.parentNode.style.width = parseInt(Math.abs(e.clientX - rx)) + "px";
 			rightBottom.parentNode.style.height = parseInt(Math.abs(e.clientY - ry)) + "px";
 			cGray.width = cTop.width = parseInt(Math.abs(e.clientX - rx));
@@ -289,6 +315,7 @@ window.onload = function () {
 	<div class="gray">
 		<canvas class="cGray" width="120" height="120"></canvas>
 	</div>
-	<input type="file" accept="image/*"/>
+	<label class="label" for="file">戳下^_^</label>
+	<input id="file" type="file" accept="image/*"/>
 </body>
 </html>
