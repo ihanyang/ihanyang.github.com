@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<title>路再长，也长不过我35码半的脚步</title>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<style>
+body, div, h5, h6, p, canvas {
+	padding: 0;
+	margin: 0;
+	font-family: "Microsoft YaHei";
+}
+.wrap {
+	width: 600px;
+	height: 300px;
+	margin-left: -300px;
+	position: absolute;
+	top: 30%;
+	left: 50%;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+.clip {
+	width: 120px;
+	height: 120px;
+	position: absolute;
+	top: 90px;
+	left: 240px;
+	border: 2px solid green;
+}
+.rightBottom {
+	width: 5px;
+	height: 5px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+	background-color: red;
+}
+.div, .gray {
+	width: 120px;
+	height: 120px;
+	margin-left: -50px;
+	position: absolute;
+	top: 8%;
+	left: 36%;
+	border: 2px solid green;
+}
+.gray {
+	left: 62%;
+}
+.div img {
+	width: 120px;
+	height: 120px;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.gray img {
+	width: 120px;
+	height: 120px;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.gray canvas {
+	opacity: 0;
+}
+.label {
+	width: 130px;
+	height: 30px;
+	position: absolute;
+	top: 30%;
+	left: 10%;
+	line-height: 30px;
+	text-align: center;
+	background-color: #F4F4F4;
+	transition: all 0.3s ease;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+.label:hover {
+	background-color: #C3E6FF;
+}
+input {
+	display: none;
+}
+</style>
+<script>
+window.onload = function () {
+	var wrap = document.querySelector(".wrap"),
+		c = document.querySelector(".bottom"),
+		cc = c.getContext("2d"),
+		cTop = document.querySelector(".top"),
+		ccTop = cTop.getContext("2d"),
+		cGray = document.querySelector(".cGray"),
+		ccGray = cGray.getContext("2d"),
+		div = document.querySelector(".div"),
+		gray = document.querySelector(".gray"),
+		clip = document.querySelector(".clip"),
+		input = document.querySelector("input"),
+		rightBottom = document.querySelector(".rightBottom"),
+		img = new Image(),
+		imgDiv = new Image(),
+		imgGray = new Image(),
+		imgDataGray,
+		getStyle = function (obj, name) {
+			if (parseInt(obj.style.name)) {
+				return parseInt(obj.style.name);
+			} else {
+				if (obj.currentStyle) {
+					return parseInt(obj.currentStyle[name]);
+				} else {
+					return parseInt(getComputedStyle(obj, false)[name]);
+				}
+			}
+		},
+		reverse = function (imgDataGray) {
+			// 反转颜色
+			for (i = 0; i < len; i+=4) {
+				red = data[i];
+				green = data[i + 1];
+				blue = data[i + 2];
+				average = Math.floor((red + green + blue) / 3);
+				data[i] = average;
+				data[i+1] = average;
+				data[i+2] = average;
+		  	}
+		  	imgDataGray.data = data;
+			ccGray.putImageData(imgDataGray, 0, 0);
+			imgGray.src = cGray.toDataURL("image/png");
+		},
+		w = 250,
+		h = 100,
+		i,
+		red,
+		green,
+		blue,
+		data,
+		len,
+		average,
+		imgData,
+		rx,
+		ry;
+
+	input.onchange = function () {
+		var reader = new FileReader();
+		reader.readAsDataURL(input.files[0]);
+		reader.onload = function () {
+			img.src = reader.result;
+			c.width = (img.width * 300) / img.height;
+			wrap.style.width = (img.width * 300) / img.height + "px";
+			cGray.width = cGray.height = cTop.width = cTop.height = 120;
+			clip.style.width = clip.style.height = "120px";
+			clip.style.top = (parseInt(wrap.style.height) - 120) / 2 + "px";
+			clip.style.left = (parseInt(wrap.style.width) - 120) / 2 + "px";
+			//img.src = "a.jpg";
+			cc.drawImage(img, 0, 0, c.width, 300);
+			imgData = cc.getImageData(0, 0, c.width, 300);
+			cc.fillStyle = "rgba(0, 0, 0, 0.5)";
+			cc.fillRect(0, 0, c.width, 300);
+			ccTop.putImageData(imgData, -getStyle(clip, "left"), -getStyle(clip, "top"));
+			imgDiv.src = cTop.toDataURL("image/png");
+			div.appendChild(imgDiv);
+			ccGray.drawImage(imgDiv, 0, 0);
+			imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
+			data = imgDataGray.data;
+			len = data.length;
+			reverse(imgDataGray);
+			gray.appendChild(imgGray);
+
+			clip.onmousedown = function (e) {
+				var x = e.clientX - getStyle(this, "left"),
+					y = e.clientY - getStyle(this, "top");
+
+				document.onmousemove = function (e) {
+					var t = e.clientY - y,
+						l = e.clientX - x;
+					if (t < 0) {
+						t = 0;
+					} else if (t > c.height - cTop.height) {
+						t = c.height - cTop.height;
+					}
+					if (l < 0) {
+						l = 0;
+					} else if (l > c.width - cTop.width) {
+						l = c.width - cTop.width;
+					}
+					t = parseInt(t);
+					l = parseInt(l);
+					clip.style.top = t + "px";
+					clip.style.left = l + "px";
+					w = l;
+					h = t;
+					ccTop.putImageData(imgData, -l, -t);
+					imgDiv.src = cTop.toDataURL("image/png");
+					ccGray.drawImage(imgDiv, 0, 0);
+					var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
+					data = imgDataGray.data;
+					len = data.length;
+					reverse(imgDataGray);
+				};
+			};
+
+			rightBottom.onmousedown = function (ev) {
+				rx = this.parentNode.parentNode.offsetLeft + getStyle(this.parentNode, "left");
+				ry = this.parentNode.parentNode.offsetTop + getStyle(this.parentNode, "top");
+				document.onmousemove = function (e) {
+					if (parseInt(Math.abs(e.clientX - rx)) + getStyle(clip, "left") >= getStyle(wrap, "width") || parseInt(Math.abs(e.clientY - ry)) + getStyle(clip, "top") >= getStyle(wrap, "height")) {
+						document.onmousemove = null;
+					} else {
+						rightBottom.parentNode.style.width = parseInt(Math.abs(e.clientX - rx)) + "px";
+						rightBottom.parentNode.style.height = parseInt(Math.abs(e.clientY - ry)) + "px";
+						cGray.width = cTop.width = parseInt(Math.abs(e.clientX - rx));
+						cGray.height = cTop.height = parseInt(Math.abs(e.clientY - ry));
+						ccTop.putImageData(imgData, -getStyle(clip, "left"), -getStyle(clip, "top"));
+						imgDiv.src = cTop.toDataURL("image/png");
+						ccGray.drawImage(imgDiv, 0, 0);
+						var imgDataGray = ccGray.getImageData(0, 0, cGray.width, cGray.height);
+						data = imgDataGray.data;
+						len = data.length;
+						reverse(imgDataGray);
+					}
+				};
+				ev.stopPropagation();
+			};
+	
+			document.onmouseup = function () {
+				document.onmousemove = null;
+			};
+		};
+	};
+};
+</script>
+</head>
+
+<body>
+	<div class="wrap">
+		<canvas class="bottom" height="300"></canvas>
+		<div class="clip">
+			<canvas class="top" width="120" height="120"></canvas>
+			<div class="rightBottom"></div>
+		</div>
+	</div>
+	<div class="div"></div>
+	<div class="gray">
+		<canvas class="cGray" width="120" height="120"></canvas>
+	</div>
+	<label class="label" for="file">戳下^_^</label>
+	<input id="file" type="file" accept="image/*"/>
+</body>
+</html>
