@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8">
+<title>路再长，也长不过我35码半的脚步</title>
+<link rel="shortcut icon" href="../images/favicon.ico" />
+<style>
+body, p, div, input {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font: 14px/1.5 "Microsoft YaHei", arial, sans-serif;
+}
+
+.wrap {
+    width: 1000px;
+    height: 450px;
+    margin-left: -500px;
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    border: 3px dashed #E6E6E6;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background: url(../images/bg.png) no-repeat center 65px;
+}
+.label {
+    width: 180px;
+    height: 45px;
+    margin-left: -90px;
+    position: absolute;
+    top: 165px;
+    left: 50%;
+    color: #FFF;
+    line-height: 45px;
+    border-radius: 3px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    background-color: #00B7EE;
+}
+.label:hover {
+    background-color: #00A2D4;
+}
+.input {
+    display: none;
+}
+.text {
+    width: 100%;
+    height: 36px;
+    position: absolute;
+    top: 220px;
+    line-height: 36px;
+    font-size: 14px;
+    color: #CCC;
+    text-align: center;
+}
+.wrap img {
+	max-width: 1000px;
+	height: 400px;
+	position: absolute;
+	top: 0;
+}
+.mask {
+	display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+.pane {
+	display: none;
+	width: 150px;
+	height: 150px;
+	margin: -75px 0 0 -75px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 3;
+	cursor: move;
+	border: 1px solid #F14382;
+}
+.change {
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	cursor: se-resize;
+	z-index: 4;
+	background: green;
+}
+.clip {
+    z-index: 2;
+}
+.c {
+	display: none;
+}
+.c-wrap {
+	width: 1100px;
+	height: 150px;
+	margin: 20px auto 0;
+	position: relative;
+}
+.c-shadow {
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+.c-pane, .c-gray, .c-rilievo, .c-comic, .c-negative, .c-black {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+.c-gray {
+	left: 190px;
+}
+.c-rilievo {
+	left: 380px;
+}
+.c-comic {
+	left: 570px;
+}
+.c-negative {
+	left: 760px;
+}
+.c-black {
+	left: 950px;
+}
+</style>
+<script>
+window.onload = function () {
+	var wrap = document.querySelector(".wrap"),
+		input = document.querySelector(".input"),
+		pane = document.querySelector(".pane"),
+		change = document.querySelector(".change"),
+		mask = document.querySelector(".mask"),
+		c = document.querySelector(".c"),
+		cc = c.getContext("2d"),
+		cPane = document.querySelector(".c-pane"),
+		ccPane = cPane.getContext("2d"),
+		cGray = document.querySelector(".c-gray"),
+		ccGray = cGray.getContext("2d"),
+		cRilievo = document.querySelector(".c-rilievo"),
+		ccRilievo = cRilievo.getContext("2d"),
+		cComic = document.querySelector(".c-comic"),
+		ccComic = cComic.getContext("2d"),
+		cNegative = document.querySelector(".c-negative"),
+		ccNegative = cNegative.getContext("2d"),
+		cBlack = document.querySelector(".c-black"),
+		ccBlack = cBlack.getContext("2d"),
+		cAll = document.querySelectorAll("canvas"),
+		cAllLength = cAll.length,
+		cImageData,
+		cGrayImageData,
+		img,
+		clip,
+		getStyle = function (obj, name) {
+			if (parseInt(obj.style.name)) {
+				return parseInt(obj.style.name);
+			} else {
+				if (obj.currentStyle) {
+					return parseInt(obj.currentStyle[name]);
+				} else {
+					return parseInt(getComputedStyle(obj, false)[name]);
+				}
+			}
+		},
+		reverseGray = function (cc, imageData) {
+			// 灰度效果
+			var i,
+				len = imageData.data.length,
+				red,
+				green,
+				blue,
+				average,
+				data = [],
+				dataGray = imageData.data;
+			for (i = 0; i < len; i+=4) {
+				red = dataGray[i];
+				green = dataGray[i + 1];
+				blue = dataGray[i + 2];
+
+				data.push(red);
+				data.push(green);
+				data.push(blue);
+				data.push(dataGray[i + 3]);
+
+				average = Math.floor((red + green + blue) / 3);
+				dataGray[i] = average;
+				dataGray[i + 1] = average;
+				dataGray[i + 2] = average;
+		  	}
+		  	imageData.data = dataGray;
+			cc.putImageData(imageData, 0, 0);
+
+			for (i = 0; i < len; i+=4) {
+				dataGray[i] = data[i];
+				dataGray[i + 1] = data[i + 1];
+				dataGray[i + 2] = data[i + 2];
+				dataGray[i + 3] = data[i + 3];
+		  	}
+
+			imageData.data = dataGray;
+		},
+		reverseRilievo = function (cc, imageData) {
+			// 浮雕效果
+			var i,
+				len = imageData.data.length,
+				red,
+				green,
+				blue,
+				data = [],
+				dataGreen = imageData.data;
+			for (i = 0; i < len; i+=4) {
+				red = dataGreen[i];
+				green = dataGreen[i + 1];
+				blue = dataGreen[i + 2];
+
+				data.push(red);
+				data.push(green);
+				data.push(blue);
+				data.push(dataGreen[i + 3]);
+
+				if (i === len - 3) {
+					dataGreen[i] = dataGreen[i];
+					dataGreen[i + 1] = dataGreen[i + 1];
+					dataGreen[i + 2] = dataGreen[i + 2];
+				}
+				dataGreen[i] = dataGreen[i + 4] - dataGreen[i] + 128;
+				dataGreen[i + 1] = dataGreen[i + 5] - dataGreen[i + 2] + 128;
+				dataGreen[i + 2] = dataGreen[i + 6] - dataGreen[i + 3] + 128;
+
+				dataGreen[i] = (dataGreen[i] + dataGreen[i + 1] + dataGreen[i + 2]) / 3;
+				dataGreen[i + 1] = (dataGreen[i] + dataGreen[i + 1] + dataGreen[i + 2]) / 3;
+				dataGreen[i + 2] = (dataGreen[i] + dataGreen[i + 1] + dataGreen[i + 2]) / 3;
+		  	}
+		  	imageData.data = dataGreen;
+			cc.putImageData(imageData, 0, 0);
+
+			for (i = 0; i < len; i+=4) {
+				dataGreen[i] = data[i];
+				dataGreen[i + 1] = data[i + 1];
+				dataGreen[i + 2] = data[i + 2];
+				dataGreen[i + 3] = data[i + 3];
+		  	}
+
+			imageData.data = dataGreen;
+		},
+		reverseComic = function (cc, imageData) {
+			// 连环画效果
+			var i,
+				len = imageData.data.length,
+				red,
+				green,
+				blue,
+				data = [];
+				dataComic = imageData.data;
+			for (i = 0; i < len; i+=4) {
+				red = dataComic[i];
+				green = dataComic[i + 1];
+				blue = dataComic[i + 2];
+
+				data.push(red);
+				data.push(green);
+				data.push(blue);
+				data.push(dataComic[i + 3]);
+
+				dataComic[i] = (green - blue + green + red) * red / 256;
+				dataComic[i + 1] = (blue - green + blue + red) * red / 256;
+				dataComic[i + 2] = (blue - green + blue + red) * green / 256;
+		  	}
+		  	imageData.data = dataComic;
+			cc.putImageData(imageData, 0, 0);
+
+			for (i = 0; i < len; i+=4) {
+				dataComic[i] = data[i];
+				dataComic[i + 1] = data[i + 1];
+				dataComic[i + 2] = data[i + 2];
+				dataComic[i + 3] = data[i + 3];
+		  	}
+
+			imageData.data = dataComic;
+		},
+		reverseNegative = function (cc, imageData) {
+			// 底片效果
+			var i,
+				len = imageData.data.length,
+				red,
+				green,
+				blue,
+				data = [],
+				dataNegative = imageData.data;
+			for (i = 0; i < len; i+=4) {
+				red = dataNegative[i];
+				green = dataNegative[i + 1];
+				blue = dataNegative[i + 2];
+
+				data.push(red);
+				data.push(green);
+				data.push(blue);
+				data.push(dataNegative[i + 3]);
+
+				dataNegative[i] = 255 - red;
+				dataNegative[i + 1] = 255 - green;
+				dataNegative[i + 2] = 255 - blue;
+		  	}
+		  	imageData.data = dataNegative;
+			cc.putImageData(imageData, 0, 0);
+
+			for (i = 0; i < len; i+=4) {
+				dataNegative[i] = data[i];
+				dataNegative[i + 1] = data[i + 1];
+				dataNegative[i + 2] = data[i + 2];
+				dataNegative[i + 3] = data[i + 3];
+		  	}
+
+			imageData.data = dataNegative;
+		},
+		reverseBlack = function (cc, imageData) {
+			// 黑白效果
+			var i,
+				len = imageData.data.length,
+				red,
+				green,
+				blue,
+				average,
+				data = [],
+				dataBlack = imageData.data;
+			for (i = 0; i < len; i+=4) {
+				red = dataBlack[i];
+				green = dataBlack[i + 1];
+				blue = dataBlack[i + 2];
+
+				data.push(red);
+				data.push(green);
+				data.push(blue);
+				data.push(dataBlack[i + 3]);
+
+				average = Math.floor((red + green + blue) / 3);
+				if (average >= 100) {
+					dataBlack[i] = 255;
+					dataBlack[i + 1] = 255;
+					dataBlack[i + 2] = 255;
+				} else {
+					dataBlack[i] = 0;
+					dataBlack[i + 1] = 0;
+					dataBlack[i + 2] = 0;
+				}
+		  	}
+		  	imageData.data = dataBlack;
+			cc.putImageData(imageData, 0, 0);
+
+			for (i = 0; i < len; i+=4) {
+				dataBlack[i] = data[i];
+				dataBlack[i + 1] = data[i + 1];
+				dataBlack[i + 2] = data[i + 2];
+				dataBlack[i + 3] = data[i + 3];
+		  	}
+
+			imageData.data = dataBlack;
+		},
+		show = function (file) {
+			var reader = new FileReader(),
+				i = 1;
+	        reader.readAsDataURL(file);
+	        reader.onload = function () {
+	        	if (document.images.length) {
+	        		wrap.removeChild(img);
+	        		wrap.removeChild(clip);
+	        		pane.style.top = "50%";
+					pane.style.left = "50%";
+					pane.style.margin = "-75px 0 0 -75px";
+	        	}
+		        img = new Image();
+		        clip = new Image();
+		        clip.className = "clip";
+		        img.src = clip.src = reader.result;
+		        wrap.insertBefore(img, pane);
+		        wrap.appendChild(clip);
+		        mask.style.display = pane.style.display = "block";
+		        wrap.style.width = 400 * img.width / img.height + "px";
+				wrap.style.height = 400 + "px";
+				wrap.style.border = "none";
+				wrap.style.top = "200px";
+				wrap.style.marginLeft = -parseInt(wrap.style.width) / 2 + "px";
+				clip.style.clip = "rect(125px, " + ((getStyle(wrap, 'width') - 150) / 2 + 150) + "px, 275px, " + (getStyle(wrap, 'width') - 150) / 2 + "px)";
+
+				c.width = getStyle(wrap, "width");
+				while (i < cAllLength) {
+					cAll[i].classList.add("c-shadow");
+					i++;
+				}
+				cc.drawImage(img, 0, 0, getStyle(wrap, "width"), 400);
+				cImageData = cc.getImageData((getStyle(wrap, "width") - 150) / 2, 125, 150, 150);
+				ccPane.putImageData(cImageData, 0, 0);
+				reverseGray(ccGray, cImageData);
+				reverseRilievo(ccRilievo, cImageData);
+				reverseComic(ccComic, cImageData);
+				reverseNegative(ccNegative, cImageData);
+				reverseBlack(ccBlack, cImageData);
+
+				pane.onmousedown = function () {
+					document.onmousemove = function (ev) {
+						var t,
+							r,
+							b,
+							l,
+							top,
+							left,
+							paneWidth,
+							wrapWidth,
+							wrapHeight;
+
+						pane.style.margin = "0";
+
+						left = ev.clientX - wrap.offsetLeft;
+						top = ev.clientY - wrap.offsetTop;
+						paneWidth = getStyle(pane, "width");
+						wrapWidth = getStyle(wrap, "width");
+						wrapHeight = getStyle(wrap, "height");
+
+						t = top - paneWidth / 2;
+						r = left + paneWidth / 2;
+						b = top + paneWidth / 2;
+						l = left - paneWidth / 2;
+
+						if (t <= 0) {
+							t = 0;
+							b = paneWidth;
+						} else if (t >= wrapHeight - paneWidth) {
+							t = wrapHeight - paneWidth;
+							b = wrapHeight;
+						} else if (l <= 0) {
+							l = 0;
+							r = paneWidth;
+						} else if (l >= wrapWidth - paneWidth) {
+							l = wrapWidth - paneWidth;
+							r = wrapWidth;
+						}
+
+						if (t === 0 && l < 0 || t === wrapHeight - paneWidth && l < 0) {
+							l = 0;
+							r = getStyle(pane, "width");
+						} else if (t === 0 && l > wrapWidth - paneWidth || t === wrapHeight - paneWidth && l > wrapWidth - paneWidth) {
+							l = wrapWidth - paneWidth;
+							r = wrapWidth;
+						}
+
+						pane.style.top = t + "px";
+						pane.style.left = l + "px";
+						clip.style.clip = "rect(" + t + "px, " + r + "px, " + b + "px, " + l + "px)";
+						cImageData = cc.getImageData(l, t, paneWidth, paneWidth);
+						ccPane.putImageData(cImageData, 0, 0);
+						reverseGray(ccGray, cImageData);
+						reverseRilievo(ccRilievo, cImageData);
+						reverseComic(ccComic, cImageData);
+						reverseNegative(ccNegative, cImageData);
+						reverseBlack(ccBlack, cImageData);
+
+						change.onmousedown = function (ev) {
+							ev.stopPropagation();
+							document.onmousemove = function (ev) {
+								var left = ev.clientX - wrap.offsetLeft,
+									top = ev.clientY - wrap.offsetTop,
+									bb;
+
+								if (left > wrapWidth) {
+									left = wrapWidth;
+								} else if (left - getStyle(pane, "left") < 150) {
+									left = l + 150;
+								}
+								bb = left - r + b;
+								if (bb >= wrapHeight) {
+									bb = wrapHeight;
+									left = l + wrapHeight - t;
+								}
+
+								pane.style.width = pane.style.height = bb - t + "px";
+								clip.style.clip = "rect(" + t + "px, " + left + "px, " + bb + "px, " + l + "px)";
+								cImageData = cc.getImageData(l, t, getStyle(pane, "width"), getStyle(pane, "width"));
+								//cPane.width = cPane.height = getStyle(pane, "width");
+								//cPane.style.transform = "scale(" + 150 / cPane.width + ")";
+								//cPane.style.top = "-75px";
+								//cPane.style.left = getStyle(cPane, "left") - ((cPane.width - cPane.width * 150) / cPane.width) + "px";
+								ccPane.putImageData(cImageData, 0, 0);
+								reverseGray(ccGray, cImageData);
+								reverseRilievo(ccRilievo, cImageData);
+								reverseComic(ccComic, cImageData);
+								reverseNegative(ccNegative, cImageData);
+								reverseBlack(ccBlack, cImageData);
+							};
+						};
+
+						/*
+						}*/
+					};
+				};
+				document.onmouseup = function () {
+					document.onmousemove = null;
+				};
+	        };
+		};
+	
+	// 文件上传
+	input.onchange = function () {	
+		show(input.files[0]);
+	};
+
+	// HTML5 拖拽上传
+	wrap.ondrop = function (ev) {
+		show(ev.dataTransfer.files[0]);
+		ev.preventDefault();
+	};
+	wrap.ondragover = function () {
+		return false;
+	};
+
+
+
+};
+</script>
+</head>
+
+<body>
+	<div class="wrap">
+		<label class="label" for="input">点击选择图片</label>
+        <input class="input" id="input" type="file" accept="image/*" />
+        <p class="text">或将图片拖到这里^_^</p>
+		<div class="pane">
+			<div class="change"></div>
+		</div>
+		<div class="mask"></div>
+	</div>
+	<canvas class="c" height="400"></canvas>
+	<div class="c-wrap">
+		<canvas class="c-pane" width="150" height="150"></canvas>
+		<canvas class="c-gray" width="150" height="150"></canvas>
+		<canvas class="c-rilievo" width="150" height="150"></canvas>
+		<canvas class="c-comic" width="150" height="150"></canvas>
+		<canvas class="c-negative" width="150" height="150"></canvas>
+		<canvas class="c-black" width="150" height="150"></canvas>
+	</div>
+</body>
+</html>
