@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
@@ -18,7 +19,6 @@ body, div {
 	top: 40%;
 	left: 43%;
 	perspective: 1000px;
-	-webkit-perspective: 1000px;
 }
 .content {
 	width: 100%;
@@ -27,7 +27,6 @@ body, div {
 	transition: all 0.7s ease-in-out;
 	transform: translateZ(-288px);
 	transform-style: preserve-3d;
-	-webkit-transform-style: preserve-3d;
 }
 .card {
 	width: 180px;
@@ -56,7 +55,6 @@ window.onload = function () {
 				clearInterval(time);
 			} else {
 				card[k].style["transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
-				card[k].style["-webkit-transform"] = "rotateY(" + k * 40 + "deg) translateZ(288px)";
 				k--;
 			}
 		}, 200),
@@ -69,7 +67,6 @@ window.onload = function () {
 				card[i].style.backgroundColor = "rgb(" + r + "," + g + "," + b + ")";
 			}
 			content.style["transform"] = "translateZ(-288px) rotateY(" + j * -40 + "deg)";
-			content.style["-webkit-transform"] = "rotateY(" + j * -40 + "deg)";
 			j++;
 		}, 3300);
 };
