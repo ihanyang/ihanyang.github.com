@@ -10127,11 +10127,7 @@
 /* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Vue = __webpack_require__(9)
-	
-		Vue.use(__webpack_require__(80))
-	
-		var _ = __webpack_require__(88)
+	var _ = __webpack_require__(88)
 	
 		module.exports = {
 			props: ["filterText", "rangeValue"],
@@ -10150,7 +10146,7 @@
 					index: 0,
 					availWidth: 0,
 					rows: 0,
-					comparison: [],
+					sorted: [],
 					moveStatus: false
 				}
 			},
@@ -10187,20 +10183,20 @@
 				this.rows = Math.ceil(this.lists.length / (Math.floor(this.availWidth / (this.rangeValue * 161))))
 			},
 			watch: {
-				"filterText": function () {
+				"filterText": function (value) {
 					var _this = this
 	
-					Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
-						var value = i
+					if (! value && this.sorted.length) {
+						this.sorted.forEach(function (v, i) {
+							document.querySelectorAll(".grid-item")[i].dataset.index = v.index
 	
-						var gridPosition = _this.redraw(value)
-	
-						var x = gridPosition.x
-	
-						var y = gridPosition.y
-	
-						v.style.transform = "translate3d(" + x + ", " + y + ", 0)"
-					})
+							document.querySelectorAll(".grid-item")[i].style.transform = "translate3d(" + v.x + "px, " + v.y + "px, 0)"
+						})
+					} else {
+						Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+							v.style.transform = "translate3d(" + _this.redraw(i).x + ", " + _this.redraw(i).y + ", 0)"
+						})
+					}
 	
 					this.rows = Math.ceil(document.querySelectorAll(".grid-item").length / (Math.floor(this.availWidth / (this.rangeValue * 161))))
 				}
@@ -10247,8 +10243,6 @@
 						}
 					})
 	
-					this.top = document.querySelector(".grid").offsetTop - document.body.scrollTop
-	
 					this.position.forEach(function (v) {
 						v.x += _this.left
 						v.y += _this.top
@@ -10257,6 +10251,8 @@
 				drag: function (coorX, coorY) {
 					var x = Math.round(coorX - this.offsetX)
 						y = Math.round(coorY - this.offsetY)
+	
+						console.log(y)
 	
 					if (this.dragTarget.$el.style.position === "absolute") {
 						this.dragTarget.$el.style.position = "fixed"
@@ -10278,71 +10274,53 @@
 					var section = []
 	
 					this.position.forEach(function (v, i) {
-						/*
-						1. cx ===v.x  Math.abs(v.y - cy)  <= 286 * 2 /3
-	
-						2. cy === v.y Math.abs(v.x - cx)  <= 286 * 2 /3
-						
-						3. Math.abs(currentX - v.x) <= 161 * 2 / 3 && Math.abs(currentY - v.y) <= 286 * 2 / 3	
-	
-						4.  (currentX === v.x && Math.abs(v.y - currentY) <= 286 * 2 / 3) || (currentY === v.y && Math.abs(v.x - currentX) <= 161 * 2 / 3) || (Math.abs(currentX - v.x) <= 161 * 2 / 3 && Math.abs(currentY - v.y) <= 286 * 2 / 3)
-						*/
-	
 						if (_this.index !== v.index) {
 							if ((Math.abs(currentX - v.x) <= (_this.rangeValue * 161) * 1 / 2 && Math.abs(currentY - v.y) <= (_this.rangeValue * 286) * 1 / 2)) {
 								ii = v.index
 	
-								console.log(v.index)
-	
-									if (_this.index < v.index) {
-										while (ii > _this.index) {
+								if (_this.index < v.index) {
+									while (ii > _this.index) {
 											
-											Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
-												if (+ v.dataset.index === ii && ! v.dataset.status) {
-													v.style.transform = "translate3d(" + (_this.position[ii - 1].x - _this.left) + "px, " + (_this.position[ii - 1].y - _this.top) + "px, 0px)"
+										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+											if (+ v.dataset.index === ii && ! v.dataset.status) {
+												v.style.transform = "translate3d(" + (_this.position[ii - 1].x - _this.left) + "px, " + (_this.position[ii - 1].y - _this.top) + "px, 0px)"
 	
-													v.dataset.index = ii - 1
+												v.dataset.index = ii - 1
 	
-													v.dataset.status = "moved"
-												}
-											})
+												v.dataset.status = "moved"
+											}
+										})
 	
-											ii--
-										}
-									} else {
-										while (ii < _this.index) {
-											
-											Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
-												if (+ v.dataset.index === ii && ! v.dataset.status) {
-													v.style.transform = "translate3d(" + (_this.position[ii + 1].x - _this.left) + "px, " + (_this.position[ii + 1].y - _this.top) + "px, 0px)"
-	
-													v.dataset.index = ii + 1
-	
-													v.dataset.status = "moved"
-												}
-											})
-	
-											ii++
-										}
+										ii--
 									}
+								} else {
+									while (ii < _this.index) {
+											
+										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+											if (+ v.dataset.index === ii && ! v.dataset.status) {
+												v.style.transform = "translate3d(" + (_this.position[ii + 1].x - _this.left) + "px, " + (_this.position[ii + 1].y - _this.top) + "px, 0px)"
 	
-									//_this.moveStatus = true
+												v.dataset.index = ii + 1
 	
-									Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
-										//v.dataset.status = ""
-										delete v.dataset.status
-									})
+												v.dataset.status = "moved"
+											}
+										})
 	
-								 	_this.value = "translate3d(" + (v.x - _this.left) + "px, " + (v.y - _this.top) + "px, 0)"
+										ii++
+									}
+								}
 	
-								 	_this.index = v.index
+								Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+									delete v.dataset.status
+								})
+	
+								_this.value = "translate3d(" + (v.x - _this.left) + "px, " + (v.y - _this.top) + "px, 0)"
+	
+								_this.index = v.index
 							}
 						}
 					})
 				},
-				dragEnd: function (e) {
-					
-				}
 			},
 			directives: {
 				render: function () {
@@ -10380,6 +10358,7 @@
 				"drag-start": function (value) {
 					if (value) {
 						this.el.style.transition = "none"
+						this.el.style["pointer-events"] = "none"
 						
 						this.vm.$parent.value = this.el.style.transform
 					}
@@ -10388,7 +10367,7 @@
 					var _this = this
 	
 					if (value && this.vm === this.vm.$parent.dragTarget) {
-						this.el.style.cssText = this.el.style.cssText.replace(/\stop.+1000;/, "")
+						this.el.style.cssText = this.el.style.cssText.replace(/\spointer.+1000;/, "")
 	
 						this.el.style.position = "absolute"
 	
@@ -10411,914 +10390,30 @@
 							v.y = v.y - _this.vm.$parent.top
 						})
 	
-						// this.vm.$parent.top = 0
+						// 保存排序后的位置
+						_this.vm.$parent.sorted = []
 	
-						// this.vm.$parent.left = 0
+						Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+							_this.vm.$parent.sorted.push({
+								x: v.style.transform.match(/\d+/g)[1],
+								y: v.style.transform.match(/\d+/g)[2],
+								index: + v.dataset.index
+							})
+						})
 					}
 				}
 			}
 		}
 
 /***/ },
-/* 80 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Install plugin.
-	 */
-	
-	function install(Vue) {
-	    Vue.url = __webpack_require__(81)(Vue);
-	    Vue.http = __webpack_require__(83)(Vue);
-	    Vue.resource = __webpack_require__(87)(Vue);
-	}
-	
-	if (window.Vue) {
-	    Vue.use(install);
-	}
-	
-	module.exports = install;
-
-
-/***/ },
-/* 81 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Service for URL templating.
-	 */
-	
-	var _ = __webpack_require__(82);
-	var el = document.createElement('a');
-	
-	module.exports = function (Vue) {
-	
-	    function Url(url, params) {
-	
-	        var urlParams = {}, queryParams = {}, options = url, query;
-	
-	        if (!_.isPlainObject(options)) {
-	            options = {url: url, params: params};
-	        }
-	
-	        options = _.extend({}, Url.options, _.options('url', this, options));
-	
-	        url = options.url.replace(/:([a-z]\w*)/gi, function (match, name) {
-	
-	            if (options.params[name]) {
-	                urlParams[name] = true;
-	                return encodeUriSegment(options.params[name]);
-	            }
-	
-	            return '';
-	        });
-	
-	        if (typeof options.root === 'string' && !url.match(/^(https?:)?\//)) {
-	            url = options.root + '/' + url;
-	        }
-	
-	        url = url.replace(/([^:])[\/]{2,}/g, '$1/');
-	        url = url.replace(/(\w+)\/+$/, '$1');
-	
-	        _.each(options.params, function (value, key) {
-	            if (!urlParams[key]) {
-	                queryParams[key] = value;
-	            }
-	        });
-	
-	        query = Url.params(queryParams);
-	
-	        if (query) {
-	            url += (url.indexOf('?') == -1 ? '?' : '&') + query;
-	        }
-	
-	        return url;
-	    }
-	
-	    /**
-	     * Url options.
-	     */
-	
-	    Url.options = {
-	        url: '',
-	        params: {}
-	    };
-	
-	    /**
-	     * Encodes a Url parameter string.
-	     *
-	     * @param {Object} obj
-	     */
-	
-	    Url.params = function (obj) {
-	
-	        var params = [];
-	
-	        params.add = function (key, value) {
-	
-	            if (_.isFunction (value)) {
-	                value = value();
-	            }
-	
-	            if (value === null) {
-	                value = '';
-	            }
-	
-	            this.push(encodeUriSegment(key) + '=' + encodeUriSegment(value));
-	        };
-	
-	        serialize(params, obj);
-	
-	        return params.join('&');
-	    };
-	
-	    /**
-	     * Parse a URL and return its components.
-	     *
-	     * @param {String} url
-	     */
-	
-	    Url.parse = function (url) {
-	
-	        el.href = url;
-	
-	        return {
-	            href: el.href,
-	            protocol: el.protocol ? el.protocol.replace(/:$/, '') : '',
-	            port: el.port,
-	            host: el.host,
-	            hostname: el.hostname,
-	            pathname: el.pathname.charAt(0) === '/' ? el.pathname : '/' + el.pathname,
-	            search: el.search ? el.search.replace(/^\?/, '') : '',
-	            hash: el.hash ? el.hash.replace(/^#/, '') : ''
-	        };
-	    };
-	
-	    function serialize(params, obj, scope) {
-	
-	        var array = _.isArray(obj), plain = _.isPlainObject(obj), hash;
-	
-	        _.each(obj, function (value, key) {
-	
-	            hash = _.isObject(value) || _.isArray(value);
-	
-	            if (scope) {
-	                key = scope + '[' + (plain || hash ? key : '') + ']';
-	            }
-	
-	            if (!scope && array) {
-	                params.add(value.name, value.value);
-	            } else if (hash) {
-	                serialize(params, value, key);
-	            } else {
-	                params.add(key, value);
-	            }
-	        });
-	    }
-	
-	    function encodeUriSegment(value) {
-	
-	        return encodeUriQuery(value, true).
-	            replace(/%26/gi, '&').
-	            replace(/%3D/gi, '=').
-	            replace(/%2B/gi, '+');
-	    }
-	
-	    function encodeUriQuery(value, spaces) {
-	
-	        return encodeURIComponent(value).
-	            replace(/%40/gi, '@').
-	            replace(/%3A/gi, ':').
-	            replace(/%24/g, '$').
-	            replace(/%2C/gi, ',').
-	            replace(/%20/g, (spaces ? '%20' : '+'));
-	    }
-	
-	    Object.defineProperty(Vue.prototype, '$url', {
-	
-	        get: function () {
-	            return _.extend(Url.bind(this), Url);
-	        }
-	
-	    });
-	
-	    return Url;
-	};
-
-
-/***/ },
-/* 82 */
-/***/ function(module, exports) {
-
-	/**
-	 * Utility functions.
-	 */
-	
-	var _ = exports;
-	
-	_.isArray = Array.isArray;
-	
-	_.isFunction = function (obj) {
-	    return obj && typeof obj === 'function';
-	};
-	
-	_.isObject = function (obj) {
-	    return obj !== null && typeof obj === 'object';
-	};
-	
-	_.isPlainObject = function (obj) {
-	    return Object.prototype.toString.call(obj) === '[object Object]';
-	};
-	
-	_.options = function (key, obj, options) {
-	
-	    var opts = obj.$options || {};
-	
-	    return _.extend({},
-	        opts[key],
-	        options
-	    );
-	};
-	
-	_.each = function (obj, iterator) {
-	
-	    var i, key;
-	
-	    if (typeof obj.length == 'number') {
-	        for (i = 0; i < obj.length; i++) {
-	            iterator.call(obj[i], obj[i], i);
-	        }
-	    } else if (_.isObject(obj)) {
-	        for (key in obj) {
-	            if (obj.hasOwnProperty(key)) {
-	                iterator.call(obj[key], obj[key], key);
-	            }
-	        }
-	    }
-	
-	    return obj;
-	};
-	
-	_.extend = function (target) {
-	
-	    var array = [], args = array.slice.call(arguments, 1), deep;
-	
-	    if (typeof target == 'boolean') {
-	        deep = target;
-	        target = args.shift();
-	    }
-	
-	    args.forEach(function (arg) {
-	        extend(target, arg, deep);
-	    });
-	
-	    return target;
-	};
-	
-	function extend(target, source, deep) {
-	    for (var key in source) {
-	        if (deep && (_.isPlainObject(source[key]) || _.isArray(source[key]))) {
-	            if (_.isPlainObject(source[key]) && !_.isPlainObject(target[key])) {
-	                target[key] = {};
-	            }
-	            if (_.isArray(source[key]) && !_.isArray(target[key])) {
-	                target[key] = [];
-	            }
-	            extend(target[key], source[key], deep);
-	        } else if (source[key] !== undefined) {
-	            target[key] = source[key];
-	        }
-	    }
-	}
-
-
-/***/ },
-/* 83 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Service for sending network requests.
-	 */
-	
-	var _ = __webpack_require__(82);
-	var xhr = __webpack_require__(84);
-	var jsonp = __webpack_require__(86);
-	var Promise = __webpack_require__(85);
-	
-	module.exports = function (Vue) {
-	
-	    var Url = Vue.url;
-	    var originUrl = Url.parse(location.href);
-	    var jsonType = {'Content-Type': 'application/json;charset=utf-8'};
-	
-	    function Http(url, options) {
-	
-	        var promise;
-	
-	        options = options || {};
-	
-	        if (_.isPlainObject(url)) {
-	            options = url;
-	            url = '';
-	        }
-	
-	        options = _.extend(true, {url: url},
-	            Http.options, _.options('http', this, options)
-	        );
-	
-	        if (options.crossOrigin === null) {
-	            options.crossOrigin = crossOrigin(options.url);
-	        }
-	
-	        options.method = options.method.toLowerCase();
-	        options.headers = _.extend({}, Http.headers.common,
-	            !options.crossOrigin ? Http.headers.custom : {},
-	            Http.headers[options.method],
-	            options.headers
-	        );
-	
-	        if (_.isPlainObject(options.data) && /^(get|jsonp)$/i.test(options.method)) {
-	            _.extend(options.params, options.data);
-	            delete options.data;
-	        }
-	
-	        if (options.emulateHTTP && !options.crossOrigin && /^(put|patch|delete)$/i.test(options.method)) {
-	            options.headers['X-HTTP-Method-Override'] = options.method;
-	            options.method = 'post';
-	        }
-	
-	        if (options.emulateJSON && _.isPlainObject(options.data)) {
-	            options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-	            options.data = Url.params(options.data);
-	        }
-	
-	        if (_.isObject(options.data) && /FormData/i.test(options.data.toString())) {
-	            delete options.headers['Content-Type'];
-	        }
-	
-	        if (_.isPlainObject(options.data)) {
-	            options.data = JSON.stringify(options.data);
-	        }
-	
-	        promise = (options.method == 'jsonp' ? jsonp : xhr).call(this, this.$url || Url, options);
-	        promise = extendPromise(promise.then(transformResponse, transformResponse), this);
-	
-	        if (options.success) {
-	            promise = promise.success(options.success);
-	        }
-	
-	        if (options.error) {
-	            promise = promise.error(options.error);
-	        }
-	
-	        return promise;
-	    }
-	
-	    function extendPromise(promise, thisArg) {
-	
-	        promise.success = function (fn) {
-	
-	            return extendPromise(promise.then(function (response) {
-	                return fn.call(thisArg, response.data, response.status, response) || response;
-	            }), thisArg);
-	
-	        };
-	
-	        promise.error = function (fn) {
-	
-	            return extendPromise(promise.then(undefined, function (response) {
-	                return fn.call(thisArg, response.data, response.status, response) || response;
-	            }), thisArg);
-	
-	        };
-	
-	        promise.always = function (fn) {
-	
-	            var cb = function (response) {
-	                return fn.call(thisArg, response.data, response.status, response) || response;
-	            };
-	
-	            return extendPromise(promise.then(cb, cb), thisArg);
-	        };
-	
-	        return promise;
-	    }
-	
-	    function transformResponse(response) {
-	
-	        try {
-	            response.data = JSON.parse(response.responseText);
-	        } catch (e) {
-	            response.data = response.responseText;
-	        }
-	
-	        return response.ok ? response : Promise.reject(response);
-	    }
-	
-	    function crossOrigin(url) {
-	
-	        var requestUrl = Url.parse(url);
-	
-	        return (requestUrl.protocol !== originUrl.protocol || requestUrl.host !== originUrl.host);
-	    }
-	
-	    Http.options = {
-	        method: 'get',
-	        params: {},
-	        data: '',
-	        xhr: null,
-	        jsonp: 'callback',
-	        beforeSend: null,
-	        crossOrigin: null,
-	        emulateHTTP: false,
-	        emulateJSON: false
-	    };
-	
-	    Http.headers = {
-	        put: jsonType,
-	        post: jsonType,
-	        patch: jsonType,
-	        delete: jsonType,
-	        common: {'Accept': 'application/json, text/plain, */*'},
-	        custom: {'X-Requested-With': 'XMLHttpRequest'}
-	    };
-	
-	    ['get', 'put', 'post', 'patch', 'delete', 'jsonp'].forEach(function (method) {
-	
-	        Http[method] = function (url, data, success, options) {
-	
-	            if (_.isFunction(data)) {
-	                options = success;
-	                success = data;
-	                data = undefined;
-	            }
-	
-	            return this(url, _.extend({method: method, data: data, success: success}, options));
-	        };
-	    });
-	
-	    Object.defineProperty(Vue.prototype, '$http', {
-	
-	        get: function () {
-	            return _.extend(Http.bind(this), Http);
-	        }
-	
-	    });
-	
-	    return Http;
-	};
-
-
-/***/ },
-/* 84 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * XMLHttp request.
-	 */
-	
-	var _ = __webpack_require__(82);
-	var Promise = __webpack_require__(85);
-	
-	module.exports = function (url, options) {
-	
-	    var request = new XMLHttpRequest(), promise;
-	
-	    if (_.isPlainObject(options.xhr)) {
-	        _.extend(request, options.xhr);
-	    }
-	
-	    if (_.isFunction(options.beforeSend)) {
-	        options.beforeSend.call(this, request, options);
-	    }
-	
-	    promise = new Promise(function (resolve, reject) {
-	
-	        request.open(options.method, url(options), true);
-	
-	        _.each(options.headers, function (value, header) {
-	            request.setRequestHeader(header, value);
-	        });
-	
-	        request.onreadystatechange = function () {
-	
-	            if (request.readyState === 4) {
-	
-	                request.ok = request.status >= 200 && request.status < 300;
-	
-	                (request.ok ? resolve : reject)(request);
-	            }
-	        };
-	
-	        request.send(options.data);
-	    });
-	
-	    return promise;
-	};
-
-
-/***/ },
-/* 85 */
-/***/ function(module, exports) {
-
-	/**
-	 * Promises/A+ polyfill v1.1.0 (https://github.com/bramstein/promis)
-	 */
-	
-	var RESOLVED = 0;
-	var REJECTED = 1;
-	var PENDING  = 2;
-	
-	function Promise(executor) {
-	
-	    this.state = PENDING;
-	    this.value = undefined;
-	    this.deferred = [];
-	
-	    var promise = this;
-	
-	    try {
-	        executor(function (x) {
-	            promise.resolve(x);
-	        }, function (r) {
-	            promise.reject(r);
-	        });
-	    } catch (e) {
-	        promise.reject(e);
-	    }
-	}
-	
-	Promise.reject = function (r) {
-	    return new Promise(function (resolve, reject) {
-	        reject(r);
-	    });
-	};
-	
-	Promise.resolve = function (x) {
-	    return new Promise(function (resolve, reject) {
-	        resolve(x);
-	    });
-	};
-	
-	Promise.all = function all(iterable) {
-	    return new Promise(function (resolve, reject) {
-	        var count = 0,
-	            result = [];
-	
-	        if (iterable.length === 0) {
-	            resolve(result);
-	        }
-	
-	        function resolver(i) {
-	            return function (x) {
-	                result[i] = x;
-	                count += 1;
-	
-	                if (count === iterable.length) {
-	                    resolve(result);
-	                }
-	            };
-	        }
-	
-	        for (var i = 0; i < iterable.length; i += 1) {
-	            iterable[i].then(resolver(i), reject);
-	        }
-	    });
-	};
-	
-	Promise.race = function race(iterable) {
-	    return new Promise(function (resolve, reject) {
-	        for (var i = 0; i < iterable.length; i += 1) {
-	            iterable[i].then(resolve, reject);
-	        }
-	    });
-	};
-	
-	var p = Promise.prototype;
-	
-	p.resolve = function resolve(x) {
-	    var promise = this;
-	
-	    if (promise.state === PENDING) {
-	        if (x === promise) {
-	            throw new TypeError('Promise settled with itself.');
-	        }
-	
-	        var called = false;
-	
-	        try {
-	            var then = x && x['then'];
-	
-	            if (x !== null && typeof x === 'object' && typeof then === 'function') {
-	                then.call(x, function (x) {
-	                    if (!called) {
-	                        promise.resolve(x);
-	                    }
-	                    called = true;
-	
-	                }, function (r) {
-	                    if (!called) {
-	                        promise.reject(r);
-	                    }
-	                    called = true;
-	                });
-	                return;
-	            }
-	        } catch (e) {
-	            if (!called) {
-	                promise.reject(e);
-	            }
-	            return;
-	        }
-	        promise.state = RESOLVED;
-	        promise.value = x;
-	        promise.notify();
-	    }
-	};
-	
-	p.reject = function reject(reason) {
-	    var promise = this;
-	
-	    if (promise.state === PENDING) {
-	        if (reason === promise) {
-	            throw new TypeError('Promise settled with itself.');
-	        }
-	
-	        promise.state = REJECTED;
-	        promise.value = reason;
-	        promise.notify();
-	    }
-	};
-	
-	p.notify = function notify() {
-	    var promise = this;
-	
-	    async(function () {
-	        if (promise.state !== PENDING) {
-	            while (promise.deferred.length) {
-	                var deferred = promise.deferred.shift(),
-	                    onResolved = deferred[0],
-	                    onRejected = deferred[1],
-	                    resolve = deferred[2],
-	                    reject = deferred[3];
-	
-	                try {
-	                    if (promise.state === RESOLVED) {
-	                        if (typeof onResolved === 'function') {
-	                            resolve(onResolved.call(undefined, promise.value));
-	                        } else {
-	                            resolve(promise.value);
-	                        }
-	                    } else if (promise.state === REJECTED) {
-	                        if (typeof onRejected === 'function') {
-	                            resolve(onRejected.call(undefined, promise.value));
-	                        } else {
-	                            reject(promise.value);
-	                        }
-	                    }
-	                } catch (e) {
-	                    reject(e);
-	                }
-	            }
-	        }
-	    });
-	};
-	
-	p.catch = function (onRejected) {
-	    return this.then(undefined, onRejected);
-	};
-	
-	p.then = function then(onResolved, onRejected) {
-	    var promise = this;
-	
-	    return new Promise(function (resolve, reject) {
-	        promise.deferred.push([onResolved, onRejected, resolve, reject]);
-	        promise.notify();
-	    });
-	};
-	
-	var queue = [];
-	var async = function (callback) {
-	    queue.push(callback);
-	
-	    if (queue.length === 1) {
-	        async.async();
-	    }
-	};
-	
-	async.run = function () {
-	    while (queue.length) {
-	        queue[0]();
-	        queue.shift();
-	    }
-	};
-	
-	if (window.MutationObserver) {
-	    var el = document.createElement('div');
-	    var mo = new MutationObserver(async.run);
-	
-	    mo.observe(el, {
-	        attributes: true
-	    });
-	
-	    async.async = function () {
-	        el.setAttribute("x", 0);
-	    };
-	} else {
-	    async.async = function () {
-	        setTimeout(async.run);
-	    };
-	}
-	
-	module.exports = window.Promise || Promise;
-
-
-/***/ },
-/* 86 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * JSONP request.
-	 */
-	
-	var _ = __webpack_require__(82);
-	var Promise = __webpack_require__(85);
-	
-	module.exports = function (url, options) {
-	
-	    var callback = '_jsonp' + Math.random().toString(36).substr(2), response = {}, script, body;
-	
-	    options.params[options.jsonp] = callback;
-	
-	    if (_.isFunction(options.beforeSend)) {
-	        options.beforeSend.call(this, {}, options);
-	    }
-	
-	    return new Promise(function (resolve, reject) {
-	
-	        script = document.createElement('script');
-	        script.src = url(options.url, options.params);
-	        script.type = 'text/javascript';
-	        script.async = true;
-	
-	        window[callback] = function (data) {
-	            body = data;
-	        };
-	
-	        var handler = function (event) {
-	
-	            delete window[callback];
-	            document.body.removeChild(script);
-	
-	            if (event.type === 'load' && !body) {
-	                event.type = 'error';
-	            }
-	
-	            response.ok = event.type !== 'error';
-	            response.status = response.ok ? 200 : 404;
-	            response.responseText = body ? body : event.type;
-	
-	            (response.ok ? resolve : reject)(response);
-	        };
-	
-	        script.onload = handler;
-	        script.onerror = handler;
-	
-	        document.body.appendChild(script);
-	    });
-	
-	};
-
-
-/***/ },
-/* 87 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Service for interacting with RESTful services.
-	 */
-	
-	var _ = __webpack_require__(82);
-	
-	module.exports = function (Vue) {
-	
-	    function Resource(url, params, actions) {
-	
-	        var self = this, resource = {};
-	
-	        actions = _.extend({},
-	            Resource.actions,
-	            actions
-	        );
-	
-	        _.each(actions, function (action, name) {
-	
-	            action = _.extend(true, {url: url, params: params || {}}, action);
-	
-	            resource[name] = function () {
-	                return (self.$http || Vue.http)(opts(action, arguments));
-	            };
-	        });
-	
-	        return resource;
-	    }
-	
-	    function opts(action, args) {
-	
-	        var options = _.extend({}, action), params = {}, data, success, error;
-	
-	        switch (args.length) {
-	
-	            case 4:
-	
-	                error = args[3];
-	                success = args[2];
-	
-	            case 3:
-	            case 2:
-	
-	                if (_.isFunction (args[1])) {
-	
-	                    if (_.isFunction (args[0])) {
-	
-	                        success = args[0];
-	                        error = args[1];
-	
-	                        break;
-	                    }
-	
-	                    success = args[1];
-	                    error = args[2];
-	
-	                } else {
-	
-	                    params = args[0];
-	                    data = args[1];
-	                    success = args[2];
-	
-	                    break;
-	                }
-	
-	            case 1:
-	
-	                if (_.isFunction (args[0])) {
-	                    success = args[0];
-	                } else if (/^(post|put|patch)$/i.test(options.method)) {
-	                    data = args[0];
-	                } else {
-	                    params = args[0];
-	                }
-	
-	                break;
-	
-	            case 0:
-	
-	                break;
-	
-	            default:
-	
-	                throw 'Expected up to 4 arguments [params, data, success, error], got ' + args.length + ' arguments';
-	        }
-	
-	        options.url = action.url;
-	        options.data = data;
-	        options.params = _.extend({}, action.params, params);
-	
-	        if (success) {
-	            options.success = success;
-	        }
-	
-	        if (error) {
-	            options.error = error;
-	        }
-	
-	        return options;
-	    }
-	
-	    Resource.actions = {
-	
-	        get: {method: 'get'},
-	        save: {method: 'post'},
-	        query: {method: 'get'},
-	        update: {method: 'put'},
-	        remove: {method: 'delete'},
-	        delete: {method: 'delete'}
-	
-	    };
-	
-	    Object.defineProperty(Vue.prototype, '$resource', {
-	
-	        get: function () {
-	            return Resource.bind(this);
-	        }
-	
-	    });
-	
-	    return Resource;
-	};
-
-
-/***/ },
+/* 80 */,
+/* 81 */,
+/* 82 */,
+/* 83 */,
+/* 84 */,
+/* 85 */,
+/* 86 */,
+/* 87 */,
 /* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -12878,652 +11973,652 @@
 
 	module.exports = [
 		{
-			"url": "/images/screen-1-1-login.jpg",
+			"url": "./images/screen-1-1-login.jpg",
 			"index": 0,
 			"name": "eeokd"
 		},
 		{
-			"url": "/images/screen-1-10-profile.jpg",
+			"url": "./images/screen-1-10-profile.jpg",
 			"index": 1,
 			"name": "sibsqrrc"
 		},
 		{
-			"url": "/images/screen-1-11-timeline.jpg",
+			"url": "./images/screen-1-11-timeline.jpg",
 			"index": 2,
 			"name": "bebt"
 		},
 		{
-			"url": "/images/screen-1-12-settings.jpg",
+			"url": "./images/screen-1-12-settings.jpg",
 			"index": 3,
 			"name": "dvwuhas"
 		},
 		{
-			"url": "/images/screen-1-13-navigation.jpg",
+			"url": "./images/screen-1-13-navigation.jpg",
 			"index": 4,
 			"name": "nd"
 		},
 		{
-			"url": "/images/screen-1-2-sign-up.jpg",
+			"url": "./images/screen-1-2-sign-up.jpg",
 			"index": 5,
 			"name": "dvegqyvi"
 		},
 		{
-			"url": "/images/screen-1-3-walkthrough.jpg",
+			"url": "./images/screen-1-3-walkthrough.jpg",
 			"index": 6,
 			"name": "wc"
 		},
 		{
-			"url": "/images/screen-1-4-home.jpg",
+			"url": "./images/screen-1-4-home.jpg",
 			"index": 7,
 			"name": "nxahlqpy"
 		},
 		{
-			"url": "/images/screen-1-5-calendar.jpg",
+			"url": "./images/screen-1-5-calendar.jpg",
 			"index": 8,
 			"name": "yo"
 		},
 		{
-			"url": "/images/screen-1-6-overview.jpg",
+			"url": "./images/screen-1-6-overview.jpg",
 			"index": 9,
 			"name": "jhbzkg"
 		},
 		{
-			"url": "/images/screen-1-7-groups.jpg",
+			"url": "./images/screen-1-7-groups.jpg",
 			"index": 10,
 			"name": "zfeqi"
 		},
 		{
-			"url": "/images/screen-1-8-list.jpg",
+			"url": "./images/screen-1-8-list.jpg",
 			"index": 11,
 			"name": "hhrqqs"
 		},
 		{
-			"url": "/images/screen-1-9-create.jpg",
+			"url": "./images/screen-1-9-create.jpg",
 			"index": 12,
 			"name": "tahjko"
 		},
 		{
-			"url": "/images/screen-10-1-login.jpg",
+			"url": "./images/screen-10-1-login.jpg",
 			"index": 13,
 			"name": "dtmkuhb"
 		},
 		{
-			"url": "/images/screen-10-10-profile.jpg",
+			"url": "./images/screen-10-10-profile.jpg",
 			"index": 14,
 			"name": "zyxhansm"
 		},
 		{
-			"url": "/images/screen-10-11-timeline.jpg",
+			"url": "./images/screen-10-11-timeline.jpg",
 			"index": 15,
 			"name": "dhnhwjro"
 		},
 		{
-			"url": "/images/screen-10-12-settings.jpg",
+			"url": "./images/screen-10-12-settings.jpg",
 			"index": 16,
 			"name": "gzw"
 		},
 		{
-			"url": "/images/screen-10-13-navigation.jpg",
+			"url": "./images/screen-10-13-navigation.jpg",
 			"index": 17,
 			"name": "oojhnvix"
 		},
 		{
-			"url": "/images/screen-10-2-sign-up.jpg",
+			"url": "./images/screen-10-2-sign-up.jpg",
 			"index": 18,
 			"name": "ocmbme"
 		},
 		{
-			"url": "/images/screen-10-3-walkthrough.jpg",
+			"url": "./images/screen-10-3-walkthrough.jpg",
 			"index": 19,
 			"name": "luv"
 		},
 		{
-			"url": "/images/screen-10-4-home.jpg",
+			"url": "./images/screen-10-4-home.jpg",
 			"index": 20,
 			"name": "ghlli"
 		},
 		{
-			"url": "/images/screen-10-5-calendar.jpg",
+			"url": "./images/screen-10-5-calendar.jpg",
 			"index": 21,
 			"name": "qnguogij"
 		},
 		{
-			"url": "/images/screen-10-6-overview.jpg",
+			"url": "./images/screen-10-6-overview.jpg",
 			"index": 22,
 			"name": "rugyp"
 		},
 		{
-			"url": "/images/screen-10-7-groups.jpg",
+			"url": "./images/screen-10-7-groups.jpg",
 			"index": 23,
 			"name": "obr"
 		},
 		{
-			"url": "/images/screen-10-8-lists.jpg",
+			"url": "./images/screen-10-8-lists.jpg",
 			"index": 24,
 			"name": "qkpqf"
 		},
 		{
-			"url": "/images/screen-10-9-create.jpg",
+			"url": "./images/screen-10-9-create.jpg",
 			"index": 25,
 			"name": "nugwtdx"
 		},
 		{
-			"url": "/images/screen-2-1-login.jpg",
+			"url": "./images/screen-2-1-login.jpg",
 			"index": 26,
 			"name": "vco"
 		},
 		{
-			"url": "/images/screen-2-10-profile.jpg",
+			"url": "./images/screen-2-10-profile.jpg",
 			"index": 27,
 			"name": "nezkhbwu"
 		},
 		{
-			"url": "/images/screen-2-11-timeline.jpg",
+			"url": "./images/screen-2-11-timeline.jpg",
 			"index": 28,
 			"name": "ne"
 		},
 		{
-			"url": "/images/screen-2-12-settings.jpg",
+			"url": "./images/screen-2-12-settings.jpg",
 			"index": 29,
 			"name": "rrpsllh"
 		},
 		{
-			"url": "/images/screen-2-13-navigation.jpg",
+			"url": "./images/screen-2-13-navigation.jpg",
 			"index": 30,
 			"name": "vxtr"
 		},
 		{
-			"url": "/images/screen-2-2-sign-up.jpg",
+			"url": "./images/screen-2-2-sign-up.jpg",
 			"index": 31,
 			"name": "polnmu"
 		},
 		{
-			"url": "/images/screen-2-3-walkthrough.jpg",
+			"url": "./images/screen-2-3-walkthrough.jpg",
 			"index": 32,
 			"name": "emguvlh"
 		},
 		{
-			"url": "/images/screen-2-4-home.jpg",
+			"url": "./images/screen-2-4-home.jpg",
 			"index": 33,
 			"name": "sfqch"
 		},
 		{
-			"url": "/images/screen-2-5-calendar.jpg",
+			"url": "./images/screen-2-5-calendar.jpg",
 			"index": 34,
 			"name": "aplgap"
 		},
 		{
-			"url": "/images/screen-2-6-overview.jpg",
+			"url": "./images/screen-2-6-overview.jpg",
 			"index": 35,
 			"name": "ahc"
 		},
 		{
-			"url": "/images/screen-2-7-groups.jpg",
+			"url": "./images/screen-2-7-groups.jpg",
 			"index": 36,
 			"name": "hg"
 		},
 		{
-			"url": "/images/screen-2-8-list.jpg",
+			"url": "./images/screen-2-8-list.jpg",
 			"index": 37,
 			"name": "jdd"
 		},
 		{
-			"url": "/images/screen-2-9-create.jpg",
+			"url": "./images/screen-2-9-create.jpg",
 			"index": 38,
 			"name": "zxqgfq"
 		},
 		{
-			"url": "/images/screen-3-1-login.jpg",
+			"url": "./images/screen-3-1-login.jpg",
 			"index": 39,
 			"name": "ulc"
 		},
 		{
-			"url": "/images/screen-3-10-profile.jpg",
+			"url": "./images/screen-3-10-profile.jpg",
 			"index": 40,
 			"name": "jztbll"
 		},
 		{
-			"url": "/images/screen-3-11-timeline.jpg",
+			"url": "./images/screen-3-11-timeline.jpg",
 			"index": 41,
 			"name": "yavnhyla"
 		},
 		{
-			"url": "/images/screen-3-12-settings.jpg",
+			"url": "./images/screen-3-12-settings.jpg",
 			"index": 42,
 			"name": "mxkkbuh"
 		},
 		{
-			"url": "/images/screen-3-13-navigation.jpg",
+			"url": "./images/screen-3-13-navigation.jpg",
 			"index": 43,
 			"name": "mjemzojb"
 		},
 		{
-			"url": "/images/screen-3-2-sign-up.jpg",
+			"url": "./images/screen-3-2-sign-up.jpg",
 			"index": 44,
 			"name": "eaircszh"
 		},
 		{
-			"url": "/images/screen-3-3-walkthrough.jpg",
+			"url": "./images/screen-3-3-walkthrough.jpg",
 			"index": 45,
 			"name": "wyyxz"
 		},
 		{
-			"url": "/images/screen-3-4-home.jpg",
+			"url": "./images/screen-3-4-home.jpg",
 			"index": 46,
 			"name": "jejh"
 		},
 		{
-			"url": "/images/screen-3-5-calendar.jpg",
+			"url": "./images/screen-3-5-calendar.jpg",
 			"index": 47,
 			"name": "imrboq"
 		},
 		{
-			"url": "/images/screen-3-6-overview.jpg",
+			"url": "./images/screen-3-6-overview.jpg",
 			"index": 48,
 			"name": "stu"
 		},
 		{
-			"url": "/images/screen-3-7-groups.jpg",
+			"url": "./images/screen-3-7-groups.jpg",
 			"index": 49,
 			"name": "sjcf"
 		},
 		{
-			"url": "/images/screen-3-8-list.jpg",
+			"url": "./images/screen-3-8-list.jpg",
 			"index": 50,
 			"name": "zvxjuhnx"
 		},
 		{
-			"url": "/images/screen-3-9-create.jpg",
+			"url": "./images/screen-3-9-create.jpg",
 			"index": 51,
 			"name": "iublnk"
 		},
 		{
-			"url": "/images/screen-4-1-login.jpg",
+			"url": "./images/screen-4-1-login.jpg",
 			"index": 52,
 			"name": "ebu"
 		},
 		{
-			"url": "/images/screen-4-10-profile.jpg",
+			"url": "./images/screen-4-10-profile.jpg",
 			"index": 53,
 			"name": "asi"
 		},
 		{
-			"url": "/images/screen-4-11-timeline.jpg",
+			"url": "./images/screen-4-11-timeline.jpg",
 			"index": 54,
 			"name": "wezfxyu"
 		},
 		{
-			"url": "/images/screen-4-12-settings.jpg",
+			"url": "./images/screen-4-12-settings.jpg",
 			"index": 55,
 			"name": "dlord"
 		},
 		{
-			"url": "/images/screen-4-13-navigation.jpg",
+			"url": "./images/screen-4-13-navigation.jpg",
 			"index": 56,
 			"name": "cvh"
 		},
 		{
-			"url": "/images/screen-4-2-sign-up.jpg",
+			"url": "./images/screen-4-2-sign-up.jpg",
 			"index": 57,
 			"name": "mucspv"
 		},
 		{
-			"url": "/images/screen-4-3-walkthrough.jpg",
+			"url": "./images/screen-4-3-walkthrough.jpg",
 			"index": 58,
 			"name": "dym"
 		},
 		{
-			"url": "/images/screen-4-4-home.jpg",
+			"url": "./images/screen-4-4-home.jpg",
 			"index": 59,
 			"name": "erli"
 		},
 		{
-			"url": "/images/screen-4-5-calendar.jpg",
+			"url": "./images/screen-4-5-calendar.jpg",
 			"index": 60,
 			"name": "tcnjcwv"
 		},
 		{
-			"url": "/images/screen-4-6-overview.jpg",
+			"url": "./images/screen-4-6-overview.jpg",
 			"index": 61,
 			"name": "wf"
 		},
 		{
-			"url": "/images/screen-4-7-groups.jpg",
+			"url": "./images/screen-4-7-groups.jpg",
 			"index": 62,
 			"name": "yvkz"
 		},
 		{
-			"url": "/images/screen-4-8-list.jpg",
+			"url": "./images/screen-4-8-list.jpg",
 			"index": 63,
 			"name": "wp"
 		},
 		{
-			"url": "/images/screen-4-9-create.jpg",
+			"url": "./images/screen-4-9-create.jpg",
 			"index": 64,
 			"name": "ysfc"
 		},
 		{
-			"url": "/images/screen-5-1-login.jpg",
+			"url": "./images/screen-5-1-login.jpg",
 			"index": 65,
 			"name": "eyq"
 		},
 		{
-			"url": "/images/screen-5-10-profile.jpg",
+			"url": "./images/screen-5-10-profile.jpg",
 			"index": 66,
 			"name": "vtgpsp"
 		},
 		{
-			"url": "/images/screen-5-11-timeline.jpg",
+			"url": "./images/screen-5-11-timeline.jpg",
 			"index": 67,
 			"name": "mynydh"
 		},
 		{
-			"url": "/images/screen-5-12-settings.jpg",
+			"url": "./images/screen-5-12-settings.jpg",
 			"index": 68,
 			"name": "ljmlq"
 		},
 		{
-			"url": "/images/screen-5-13-navigation.jpg",
+			"url": "./images/screen-5-13-navigation.jpg",
 			"index": 69,
 			"name": "vqp"
 		},
 		{
-			"url": "/images/screen-5-2-sign-up.jpg",
+			"url": "./images/screen-5-2-sign-up.jpg",
 			"index": 70,
 			"name": "sssfab"
 		},
 		{
-			"url": "/images/screen-5-3-walkthrough.jpg",
+			"url": "./images/screen-5-3-walkthrough.jpg",
 			"index": 71,
 			"name": "vg"
 		},
 		{
-			"url": "/images/screen-5-4-home.jpg",
+			"url": "./images/screen-5-4-home.jpg",
 			"index": 72,
 			"name": "rtseua"
 		},
 		{
-			"url": "/images/screen-5-5-calendar.jpg",
+			"url": "./images/screen-5-5-calendar.jpg",
 			"index": 73,
 			"name": "amoislh"
 		},
 		{
-			"url": "/images/screen-5-6-overview.jpg",
+			"url": "./images/screen-5-6-overview.jpg",
 			"index": 74,
 			"name": "jtqxgs"
 		},
 		{
-			"url": "/images/screen-5-7-groups.jpg",
+			"url": "./images/screen-5-7-groups.jpg",
 			"index": 75,
 			"name": "hwaunslm"
 		},
 		{
-			"url": "/images/screen-5-8-list.jpg",
+			"url": "./images/screen-5-8-list.jpg",
 			"index": 76,
 			"name": "hsugan"
 		},
 		{
-			"url": "/images/screen-5-9-create.jpg",
+			"url": "./images/screen-5-9-create.jpg",
 			"index": 77,
 			"name": "yojuss"
 		},
 		{
-			"url": "/images/screen-6-1-login.jpg",
+			"url": "./images/screen-6-1-login.jpg",
 			"index": 78,
 			"name": "ipekarly"
 		},
 		{
-			"url": "/images/screen-6-10-profile.jpg",
+			"url": "./images/screen-6-10-profile.jpg",
 			"index": 79,
 			"name": "gqvqqh"
 		},
 		{
-			"url": "/images/screen-6-11-timeline.jpg",
+			"url": "./images/screen-6-11-timeline.jpg",
 			"index": 80,
 			"name": "kscaf"
 		},
 		{
-			"url": "/images/screen-6-12-settings.jpg",
+			"url": "./images/screen-6-12-settings.jpg",
 			"index": 81,
 			"name": "acogr"
 		},
 		{
-			"url": "/images/screen-6-13-navigation.jpg",
+			"url": "./images/screen-6-13-navigation.jpg",
 			"index": 82,
 			"name": "qhsupdzj"
 		},
 		{
-			"url": "/images/screen-6-2-sign-up.jpg",
+			"url": "./images/screen-6-2-sign-up.jpg",
 			"index": 83,
 			"name": "gls"
 		},
 		{
-			"url": "/images/screen-6-3-walkthrough.jpg",
+			"url": "./images/screen-6-3-walkthrough.jpg",
 			"index": 84,
 			"name": "vdudkujb"
 		},
 		{
-			"url": "/images/screen-6-4-home.jpg",
+			"url": "./images/screen-6-4-home.jpg",
 			"index": 85,
 			"name": "qdktd"
 		},
 		{
-			"url": "/images/screen-6-5-calendar.jpg",
+			"url": "./images/screen-6-5-calendar.jpg",
 			"index": 86,
 			"name": "zbxluag"
 		},
 		{
-			"url": "/images/screen-6-6-overview.jpg",
+			"url": "./images/screen-6-6-overview.jpg",
 			"index": 87,
 			"name": "qphqdoy"
 		},
 		{
-			"url": "/images/screen-6-7-groups.jpg",
+			"url": "./images/screen-6-7-groups.jpg",
 			"index": 88,
 			"name": "zrovgzh"
 		},
 		{
-			"url": "/images/screen-6-8-list.jpg",
+			"url": "./images/screen-6-8-list.jpg",
 			"index": 89,
 			"name": "ib"
 		},
 		{
-			"url": "/images/screen-6-9-create.jpg",
+			"url": "./images/screen-6-9-create.jpg",
 			"index": 90,
 			"name": "wlwnp"
 		},
 		{
-			"url": "/images/screen-7-1-login.jpg",
+			"url": "./images/screen-7-1-login.jpg",
 			"index": 91,
 			"name": "mkhfbisz"
 		},
 		{
-			"url": "/images/screen-7-10-profile.jpg",
+			"url": "./images/screen-7-10-profile.jpg",
 			"index": 92,
 			"name": "ccnst"
 		},
 		{
-			"url": "/images/screen-7-11-timeline.jpg",
+			"url": "./images/screen-7-11-timeline.jpg",
 			"index": 93,
 			"name": "tzwjw"
 		},
 		{
-			"url": "/images/screen-7-12-settings.jpg",
+			"url": "./images/screen-7-12-settings.jpg",
 			"index": 94,
 			"name": "qfbb"
 		},
 		{
-			"url": "/images/screen-7-13-navigation.jpg",
+			"url": "./images/screen-7-13-navigation.jpg",
 			"index": 95,
 			"name": "hdiq"
 		},
 		{
-			"url": "/images/screen-7-2-sign-up.jpg",
+			"url": "./images/screen-7-2-sign-up.jpg",
 			"index": 96,
 			"name": "oo"
 		},
 		{
-			"url": "/images/screen-7-3-walkthrough.jpg",
+			"url": "./images/screen-7-3-walkthrough.jpg",
 			"index": 97,
 			"name": "rohbjdlo"
 		},
 		{
-			"url": "/images/screen-7-4-home.jpg",
+			"url": "./images/screen-7-4-home.jpg",
 			"index": 98,
 			"name": "yx"
 		},
 		{
-			"url": "/images/screen-7-5-calendar.jpg",
+			"url": "./images/screen-7-5-calendar.jpg",
 			"index": 99,
 			"name": "lnwmf"
 		},
 		{
-			"url": "/images/screen-7-6-overview.jpg",
+			"url": "./images/screen-7-6-overview.jpg",
 			"index": 100,
 			"name": "it"
 		},
 		{
-			"url": "/images/screen-7-7-groups.jpg",
+			"url": "./images/screen-7-7-groups.jpg",
 			"index": 101,
 			"name": "iwok"
 		},
 		{
-			"url": "/images/screen-7-8-lists.jpg",
+			"url": "./images/screen-7-8-lists.jpg",
 			"index": 102,
 			"name": "qelbjp"
 		},
 		{
-			"url": "/images/screen-7-9-create.jpg",
+			"url": "./images/screen-7-9-create.jpg",
 			"index": 103,
 			"name": "dzcnsw"
 		},
 		{
-			"url": "/images/screen-8-1-login.jpg",
+			"url": "./images/screen-8-1-login.jpg",
 			"index": 104,
 			"name": "uvmm"
 		},
 		{
-			"url": "/images/screen-8-10-profile.jpg",
+			"url": "./images/screen-8-10-profile.jpg",
 			"index": 105,
 			"name": "dbw"
 		},
 		{
-			"url": "/images/screen-8-11-timeline.jpg",
+			"url": "./images/screen-8-11-timeline.jpg",
 			"index": 106,
 			"name": "fcm"
 		},
 		{
-			"url": "/images/screen-8-12-settings.jpg",
+			"url": "./images/screen-8-12-settings.jpg",
 			"index": 107,
 			"name": "iqado"
 		},
 		{
-			"url": "/images/screen-8-13-navigation.jpg",
+			"url": "./images/screen-8-13-navigation.jpg",
 			"index": 108,
 			"name": "txnhfo"
 		},
 		{
-			"url": "/images/screen-8-2-sign-up.jpg",
+			"url": "./images/screen-8-2-sign-up.jpg",
 			"index": 109,
 			"name": "kl"
 		},
 		{
-			"url": "/images/screen-8-3-walkthrough.jpg",
+			"url": "./images/screen-8-3-walkthrough.jpg",
 			"index": 110,
 			"name": "ktewoao"
 		},
 		{
-			"url": "/images/screen-8-4-home.jpg",
+			"url": "./images/screen-8-4-home.jpg",
 			"index": 111,
 			"name": "am"
 		},
 		{
-			"url": "/images/screen-8-5-calendar.jpg",
+			"url": "./images/screen-8-5-calendar.jpg",
 			"index": 112,
 			"name": "svwbov"
 		},
 		{
-			"url": "/images/screen-8-6-overview.jpg",
+			"url": "./images/screen-8-6-overview.jpg",
 			"index": 113,
 			"name": "atdli"
 		},
 		{
-			"url": "/images/screen-8-7-groups.jpg",
+			"url": "./images/screen-8-7-groups.jpg",
 			"index": 114,
 			"name": "kcjejndr"
 		},
 		{
-			"url": "/images/screen-8-8-list.jpg",
+			"url": "./images/screen-8-8-list.jpg",
 			"index": 115,
 			"name": "oosflec"
 		},
 		{
-			"url": "/images/screen-8-9-create.jpg",
+			"url": "./images/screen-8-9-create.jpg",
 			"index": 116,
 			"name": "df"
 		},
 		{
-			"url": "/images/screen-9-1-login.jpg",
+			"url": "./images/screen-9-1-login.jpg",
 			"index": 117,
 			"name": "vb"
 		},
 		{
-			"url": "/images/screen-9-10-profile.jpg",
+			"url": "./images/screen-9-10-profile.jpg",
 			"index": 118,
 			"name": "uoaabegy"
 		},
 		{
-			"url": "/images/screen-9-11-timeline.jpg",
+			"url": "./images/screen-9-11-timeline.jpg",
 			"index": 119,
 			"name": "jkn"
 		},
 		{
-			"url": "/images/screen-9-12-settings.jpg",
+			"url": "./images/screen-9-12-settings.jpg",
 			"index": 120,
 			"name": "qdcpahb"
 		},
 		{
-			"url": "/images/screen-9-13-navigation.jpg",
+			"url": "./images/screen-9-13-navigation.jpg",
 			"index": 121,
 			"name": "uwmuyum"
 		},
 		{
-			"url": "/images/screen-9-2-sign-up.jpg",
+			"url": "./images/screen-9-2-sign-up.jpg",
 			"index": 122,
 			"name": "bl"
 		},
 		{
-			"url": "/images/screen-9-3-walkthrough.jpg",
+			"url": "./images/screen-9-3-walkthrough.jpg",
 			"index": 123,
 			"name": "qz"
 		},
 		{
-			"url": "/images/screen-9-4-home.jpg",
+			"url": "./images/screen-9-4-home.jpg",
 			"index": 124,
 			"name": "pdct"
 		},
 		{
-			"url": "/images/screen-9-5-calendar.jpg",
+			"url": "./images/screen-9-5-calendar.jpg",
 			"index": 125,
 			"name": "hzagk"
 		},
 		{
-			"url": "/images/screen-9-6-overview.jpg",
+			"url": "./images/screen-9-6-overview.jpg",
 			"index": 126,
 			"name": "axjdoyhi"
 		},
 		{
-			"url": "/images/screen-9-7-groups.jpg",
+			"url": "./images/screen-9-7-groups.jpg",
 			"index": 127,
 			"name": "ggstzh"
 		},
 		{
-			"url": "/images/screen-9-8-list.jpg",
+			"url": "./images/screen-9-8-list.jpg",
 			"index": 128,
 			"name": "twedapp"
 		},
 		{
-			"url": "/images/screen-9-9-create.jpg",
+			"url": "./images/screen-9-9-create.jpg",
 			"index": 129,
 			"name": "yuoqi"
 		}
@@ -13533,13 +12628,13 @@
 /* 90 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"rangeValue\" v-redraw=\"availWidth\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this), mouseup: dragEnd\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.index\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
+	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"rangeValue\" v-redraw=\"availWidth\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this), mouseup: dragEnd\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.name\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
 
 /***/ },
 /* 91 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, ReactJS grid component using an absolute transform3d layout for React 0.13.x and ES6.\r\n\t\t\t<a href=\"#\">Read more here</a>\r\n\t\t</p>\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<!-- <h2 v-text=\"range\"></h2> -->\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
+	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
 
 /***/ }
 /******/ ]);
