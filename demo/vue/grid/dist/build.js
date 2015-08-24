@@ -12628,13 +12628,13 @@
 /* 90 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"rangeValue\" v-redraw=\"availWidth\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this), mouseup: dragEnd\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.name\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
+	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"rangeValue\" v-redraw=\"availWidth\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this)\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.name\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
 
 /***/ },
 /* 91 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
+	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<iframe src=\"https://ghbtns.com/github-btn.html?user=ihanyang&repo=Absolute-Grid&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
 
 /***/ }
 /******/ ]);

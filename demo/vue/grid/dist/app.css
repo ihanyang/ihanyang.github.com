@@ -435,15 +435,18 @@ th {
 .wrap {
 	max-width: 1100px;
 	margin: 0 auto;
+	text-align: center;
 }
 .title {
 	color: #00489F;
 	font-size: 50px;
 	font-weight: normal;
-	text-align: center;
 }
 .desc, .operation {
-	text-align: center;
+	margin: 20px 0;
+}
+.operation {
+	margin-bottom: 10px;
 }
 .filter {
 	padding: 8px;
