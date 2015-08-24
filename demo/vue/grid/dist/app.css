@@ -439,6 +439,7 @@ th {
 .title {
 	color: #00489F;
 	font-size: 50px;
+	font-weight: normal;
 	text-align: center;
 }
 .desc, .operation {
@@ -448,7 +449,6 @@ th {
 	padding: 8px;
 	outline: none;
 	color: #333;
-	font-weight: bold;
 	border-radius: 3px;
 	border: 1px solid #CCC;
 	box-shadow: 0 1px 3px #EEE;
