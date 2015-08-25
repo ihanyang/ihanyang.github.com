@@ -10096,7 +10096,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(77)
-	module.exports.template = __webpack_require__(91)
+	module.exports.template = __webpack_require__(83)
 
 
 /***/ },
@@ -10120,20 +10120,20 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(79)
-	module.exports.template = __webpack_require__(90)
+	module.exports.template = __webpack_require__(82)
 
 
 /***/ },
 /* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(88)
+	var _ = __webpack_require__(80)
 	
 		module.exports = {
 			props: ["filterText", "rangeValue"],
 			data: function () {
 				return {
-					lists: __webpack_require__(89),
+					lists: __webpack_require__(81),
 					position: [],
 					offsetX: 0,
 					offsetY: 0,
@@ -10252,8 +10252,6 @@
 					var x = Math.round(coorX - this.offsetX)
 						y = Math.round(coorY - this.offsetY)
 	
-						console.log(y)
-	
 					if (this.dragTarget.$el.style.position === "absolute") {
 						this.dragTarget.$el.style.position = "fixed"
 	
@@ -10265,14 +10263,16 @@
 	
 					this.dragTarget.$el.style.transform = "translate3d(" + x + "px, " + y + "px, 0)"
 	
-					_.throttle(this.detect, 200)(x, y)
-					//this.detect(x, y)
+					//_.throttle(this.detect, 200)(x, y)
+					this.detect(x, y)
 				},
 				detect: function (currentX, currentY) {
 					var _this = this
 					var ii
 					var section = []
 	
+					currentY += document.body.scrollTop
+					
 					this.position.forEach(function (v, i) {
 						if (_this.index !== v.index) {
 							if ((Math.abs(currentX - v.x) <= (_this.rangeValue * 161) * 1 / 2 && Math.abs(currentY - v.y) <= (_this.rangeValue * 286) * 1 / 2)) {
@@ -10281,9 +10281,10 @@
 								if (_this.index < v.index) {
 									while (ii > _this.index) {
 											
-										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v) {
 											if (+ v.dataset.index === ii && ! v.dataset.status) {
 												v.style.transform = "translate3d(" + (_this.position[ii - 1].x - _this.left) + "px, " + (_this.position[ii - 1].y - _this.top) + "px, 0px)"
+												v.dataset.aaa = "bbb"
 	
 												v.dataset.index = ii - 1
 	
@@ -10296,7 +10297,7 @@
 								} else {
 									while (ii < _this.index) {
 											
-										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v) {
 											if (+ v.dataset.index === ii && ! v.dataset.status) {
 												v.style.transform = "translate3d(" + (_this.position[ii + 1].x - _this.left) + "px, " + (_this.position[ii + 1].y - _this.top) + "px, 0px)"
 	
@@ -10316,11 +10317,13 @@
 	
 								_this.value = "translate3d(" + (v.x - _this.left) + "px, " + (v.y - _this.top) + "px, 0)"
 	
+								_this.dragTarget.$el.dataset.index = v.index
+	
 								_this.index = v.index
 							}
 						}
 					})
-				},
+				}
 			},
 			directives: {
 				render: function () {
@@ -10406,15 +10409,7 @@
 		}
 
 /***/ },
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */,
-/* 88 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -11968,7 +11963,7 @@
 
 
 /***/ },
-/* 89 */
+/* 81 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -12625,16 +12620,16 @@
 	]
 
 /***/ },
-/* 90 */
+/* 82 */
 /***/ function(module, exports) {
 
 	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"rangeValue\" v-redraw=\"availWidth\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this)\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.name\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
 
 /***/ },
-/* 91 */
+/* 83 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<iframe src=\"https://ghbtns.com/github-btn.html?user=ihanyang&repo=Absolute-Grid&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
+	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<!-- <iframe src=\"https://ghbtns.com/github-btn.html?user=ihanyang&repo=Absolute-Grid&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe> -->\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
 
 /***/ }
 /******/ ]);

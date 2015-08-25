@@ -484,6 +484,7 @@ th {
 .grid-text {
 	width: 100%;
 	position: absolute;
+	left: 0;
 	bottom: -25px;
 	color: #555;
 	font-size: 12px;
