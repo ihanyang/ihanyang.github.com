@@ -10096,7 +10096,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(77)
-	module.exports.template = __webpack_require__(83)
+	module.exports.template = __webpack_require__(91)
 
 
 /***/ },
@@ -10120,20 +10120,24 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(79)
-	module.exports.template = __webpack_require__(82)
+	module.exports.template = __webpack_require__(90)
 
 
 /***/ },
 /* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(80)
+	var Vue = __webpack_require__(9)
+	
+		Vue.use(__webpack_require__(80))
+	
+		var _ = __webpack_require__(88)
 	
 		module.exports = {
 			props: ["filterText", "rangeValue"],
 			data: function () {
 				return {
-					lists: __webpack_require__(81),
+					lists: __webpack_require__(89),
 					position: [],
 					offsetX: 0,
 					offsetY: 0,
@@ -10171,7 +10175,43 @@
 					_this.rows = Math.ceil(document.querySelectorAll(".grid-item").length / (Math.floor(_this.availWidth / (_this.rangeValue * 161))))
 	
 					// 更新数组
-					_this.position.splice(0, 130)
+					_this.position.splice(0, _this.position.length / 2)
+	
+					var by = function(name){
+					    return function(o, p){
+					        var a, b
+					        if (typeof o === "object" && typeof p === "object" && o && p) {
+					            a = o[name]
+					            b = p[name]
+					            if (a === b) {
+					                return 0
+					            }
+					            if (typeof a === typeof b) {
+					                return a < b ? -1 : 1
+					            }
+					            return typeof a < typeof b ? -1 : 1
+					        }
+					        else {
+					            throw ("error")
+					        }
+					    }
+					}
+	
+					_this.position.sort(by("index"));
+	
+					console.log(_this.position.length)
+					console.log(_this.position[1].y)
+	
+					// 更新 sorted
+					_this.sorted = []
+	
+						Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+							_this.sorted.push({
+								x: + v.style.transform.match(/\d+/g)[1],
+								y: + v.style.transform.match(/\d+/g)[2],
+								index: v.dataset.index
+							})
+						})
 				})
 	
 				this.top = document.querySelector(".grid").offsetTop
@@ -10185,19 +10225,36 @@
 			watch: {
 				"filterText": function (value) {
 					var _this = this
+					var x
+					var y
 	
-					if (! value && this.sorted.length) {
-						this.sorted.forEach(function (v, i) {
-							document.querySelectorAll(".grid-item")[i].dataset.index = v.index
+					// if (! value && this.sorted.length) {
+					// 	this.sorted.forEach(function (v, i) {
+					// 		document.querySelectorAll(".grid-item")[i].dataset.index = v.index
 	
-							document.querySelectorAll(".grid-item")[i].style.transform = "translate3d(" + v.x + "px, " + v.y + "px, 0)"
-						})
-					} else {
+					// 		document.querySelectorAll(".grid-item")[i].style.transform = "translate3d(" + v.x + "px, " + v.y + "px, 0)"
+	
+					// 		//_this.position = _this.sorted.slice()
+					// 		_this.sorted = []
+					// 	})
+					// } else {
+						this.position = []
+	
 						Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
-							v.style.transform = "translate3d(" + _this.redraw(i).x + ", " + _this.redraw(i).y + ", 0)"
-						})
-					}
+							x = _this.redraw(i).x
+							y = _this.redraw(i).y
 	
+							v.style.transform = "translate3d(" + x + ", " + y + ", 0)"
+	
+							_this.position.push({
+								x: ~~ x.replace("px", ""),
+								y: ~~ y.replace("px", ""),
+								index: i
+							})
+						})
+					//}
+	
+					console.log(this.position[1].x)
 					this.rows = Math.ceil(document.querySelectorAll(".grid-item").length / (Math.floor(this.availWidth / (this.rangeValue * 161))))
 				}
 			},
@@ -10243,10 +10300,10 @@
 						}
 					})
 	
-					this.position.forEach(function (v) {
-						v.x += _this.left
-						v.y += _this.top
-					})
+					// this.position.forEach(function (v) {
+					// 	v.x += _this.left
+					// 	v.y += _this.top
+					// })
 				},
 				drag: function (coorX, coorY) {
 					var x = Math.round(coorX - this.offsetX)
@@ -10263,8 +10320,8 @@
 	
 					this.dragTarget.$el.style.transform = "translate3d(" + x + "px, " + y + "px, 0)"
 	
-					//_.throttle(this.detect, 200)(x, y)
-					this.detect(x, y)
+					_.throttle(this.detect, 200)(x - this.left, y - this.top)
+					//this.detect(x, y)
 				},
 				detect: function (currentX, currentY) {
 					var _this = this
@@ -10272,82 +10329,103 @@
 					var section = []
 	
 					currentY += document.body.scrollTop
-					
+	
 					this.position.forEach(function (v, i) {
+						/*
+						1. cx ===v.x  Math.abs(v.y - cy)  <= 286 * 2 /3
+	
+						2. cy === v.y Math.abs(v.x - cx)  <= 286 * 2 /3
+						
+						3. Math.abs(currentX - v.x) <= 161 * 2 / 3 && Math.abs(currentY - v.y) <= 286 * 2 / 3	
+	
+						4.  (currentX === v.x && Math.abs(v.y - currentY) <= 286 * 2 / 3) || (currentY === v.y && Math.abs(v.x - currentX) <= 161 * 2 / 3) || (Math.abs(currentX - v.x) <= 161 * 2 / 3 && Math.abs(currentY - v.y) <= 286 * 2 / 3)
+						*/
+	
 						if (_this.index !== v.index) {
 							if ((Math.abs(currentX - v.x) <= (_this.rangeValue * 161) * 1 / 2 && Math.abs(currentY - v.y) <= (_this.rangeValue * 286) * 1 / 2)) {
 								ii = v.index
 	
-								if (_this.index < v.index) {
-									while (ii > _this.index) {
+								//console.log(v.index)
+	
+									if (_this.index < v.index) {
+										while (ii > _this.index) {
 											
-										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v) {
-											if (+ v.dataset.index === ii && ! v.dataset.status) {
-												v.style.transform = "translate3d(" + (_this.position[ii - 1].x - _this.left) + "px, " + (_this.position[ii - 1].y - _this.top) + "px, 0px)"
-												v.dataset.aaa = "bbb"
+											Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+												if (+ v.dataset.index === ii && ! v.dataset.status) {
+													v.style.transform = "translate3d(" + (_this.position[ii - 1].x) + "px, " + (_this.position[ii - 1].y) + "px, 0px)"
 	
-												v.dataset.index = ii - 1
+													v.dataset.index = ii - 1
 	
-												v.dataset.status = "moved"
-											}
-										})
+													v.dataset.status = "moved"
+												}
+											})
 	
-										ii--
-									}
-								} else {
-									while (ii < _this.index) {
+											ii--
+										}
+									} else {
+										while (ii < _this.index) {
 											
-										Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v) {
-											if (+ v.dataset.index === ii && ! v.dataset.status) {
-												v.style.transform = "translate3d(" + (_this.position[ii + 1].x - _this.left) + "px, " + (_this.position[ii + 1].y - _this.top) + "px, 0px)"
+											Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+												if (+ v.dataset.index === ii && ! v.dataset.status) {
+													v.style.transform = "translate3d(" + (_this.position[ii + 1].x) + "px, " + (_this.position[ii + 1].y) + "px, 0px)"
 	
-												v.dataset.index = ii + 1
+													v.dataset.index = ii + 1
 	
-												v.dataset.status = "moved"
-											}
-										})
+													v.dataset.status = "moved"
+												}
+											})
 	
-										ii++
+											ii++
+										}
 									}
-								}
 	
-								Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
-									delete v.dataset.status
-								})
+									//_this.moveStatus = true
 	
-								_this.value = "translate3d(" + (v.x - _this.left) + "px, " + (v.y - _this.top) + "px, 0)"
+									Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
+										//v.dataset.status = ""
+										delete v.dataset.status
+									})
 	
-								_this.dragTarget.$el.dataset.index = v.index
+								 	_this.value = "translate3d(" + v.x + "px, " + v.y + "px, 0)"
 	
-								_this.index = v.index
+								 	_this.dragTarget.$el.dataset.index = v.index
+	
+								 	_this.index = v.index
 							}
 						}
 					})
+				},
+				dragEnd: function (e) {
+					
 				}
 			},
 			directives: {
-				render: function () {
+				render: function (changed, previous) {
 					var _this = this
 	
-					var value = this.el.dataset.index
+					var value = + this.el.dataset.index
 	
 					var x = this.vm.$parent.redraw(value).x
 	
 					var y = this.vm.$parent.redraw(value).y
 	
-					this.el.style.transform = "translate3d(" + x + ", " + y + ", 0)"
+					if (! previous || previous && previous.availWidth !== 0) {
+						this.el.style.transform = "translate3d(" + x + ", " + y + ", 0)"
 	
-					this.el.style.position = "absolute"
+						this.el.style.position = "absolute"
 	
-					setTimeout(function () {
-						_this.el.style.transition = "transform 0.3s ease"
-					}, 0)
+						setTimeout(function () {
+							_this.el.style.transition = "transform 0.3s ease"
+						}, 0)
 	
-					this.vm.$parent.position.push({
-						x: ~~ x.replace("px", ""),
-						y: ~~ y.replace("px", ""),
-						index: + value
-					})
+						this.vm.$parent.position.push({
+							x: ~~ x.replace("px", ""),
+							y: ~~ y.replace("px", ""),
+							index: + value
+						})
+	
+						//console.log(888)
+					}
 				},
 				redraw: function () {
 					var value = + this.el.dataset.index
@@ -10356,6 +10434,7 @@
 	
 					var y = this.vm.$parent.redraw(value).y
 	
+					console.log(444444)
 					this.el.style.transform = "translate3d(" + x + ", " + y + ", 0)"
 				},
 				"drag-start": function (value) {
@@ -10388,21 +10467,24 @@
 	
 						this.vm.$parent.index = 0
 	
-						this.vm.$parent.position.forEach(function (v) {
-							v.x = v.x - _this.vm.$parent.left
-							v.y = v.y - _this.vm.$parent.top
-						})
+						// this.vm.$parent.position.forEach(function (v) {
+						// 	v.x = v.x - _this.vm.$parent.left
+						// 	v.y = v.y - _this.vm.$parent.top
+						// })
 	
 						// 保存排序后的位置
-						_this.vm.$parent.sorted = []
+						
+						this.vm.$parent.sorted = []
 	
 						Array.prototype.slice.call(document.querySelectorAll(".grid-item")).forEach(function (v, i) {
 							_this.vm.$parent.sorted.push({
-								x: v.style.transform.match(/\d+/g)[1],
-								y: v.style.transform.match(/\d+/g)[2],
-								index: + v.dataset.index
+								x: + v.style.transform.match(/\d+/g)[1],
+								y: + v.style.transform.match(/\d+/g)[2],
+								index: v.dataset.index
 							})
 						})
+	
+						//_this.vm.$parent.sorted = this.vm.$parent.position.slice()
 					}
 				}
 			}
@@ -10410,6 +10492,905 @@
 
 /***/ },
 /* 80 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Install plugin.
+	 */
+	
+	function install(Vue) {
+	    Vue.url = __webpack_require__(81)(Vue);
+	    Vue.http = __webpack_require__(83)(Vue);
+	    Vue.resource = __webpack_require__(87)(Vue);
+	}
+	
+	if (window.Vue) {
+	    Vue.use(install);
+	}
+	
+	module.exports = install;
+
+
+/***/ },
+/* 81 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Service for URL templating.
+	 */
+	
+	var _ = __webpack_require__(82);
+	var el = document.createElement('a');
+	
+	module.exports = function (Vue) {
+	
+	    function Url(url, params) {
+	
+	        var urlParams = {}, queryParams = {}, options = url, query;
+	
+	        if (!_.isPlainObject(options)) {
+	            options = {url: url, params: params};
+	        }
+	
+	        options = _.extend({}, Url.options, _.options('url', this, options));
+	
+	        url = options.url.replace(/:([a-z]\w*)/gi, function (match, name) {
+	
+	            if (options.params[name]) {
+	                urlParams[name] = true;
+	                return encodeUriSegment(options.params[name]);
+	            }
+	
+	            return '';
+	        });
+	
+	        if (typeof options.root === 'string' && !url.match(/^(https?:)?\//)) {
+	            url = options.root + '/' + url;
+	        }
+	
+	        url = url.replace(/([^:])[\/]{2,}/g, '$1/');
+	        url = url.replace(/(\w+)\/+$/, '$1');
+	
+	        _.each(options.params, function (value, key) {
+	            if (!urlParams[key]) {
+	                queryParams[key] = value;
+	            }
+	        });
+	
+	        query = Url.params(queryParams);
+	
+	        if (query) {
+	            url += (url.indexOf('?') == -1 ? '?' : '&') + query;
+	        }
+	
+	        return url;
+	    }
+	
+	    /**
+	     * Url options.
+	     */
+	
+	    Url.options = {
+	        url: '',
+	        params: {}
+	    };
+	
+	    /**
+	     * Encodes a Url parameter string.
+	     *
+	     * @param {Object} obj
+	     */
+	
+	    Url.params = function (obj) {
+	
+	        var params = [];
+	
+	        params.add = function (key, value) {
+	
+	            if (_.isFunction (value)) {
+	                value = value();
+	            }
+	
+	            if (value === null) {
+	                value = '';
+	            }
+	
+	            this.push(encodeUriSegment(key) + '=' + encodeUriSegment(value));
+	        };
+	
+	        serialize(params, obj);
+	
+	        return params.join('&');
+	    };
+	
+	    /**
+	     * Parse a URL and return its components.
+	     *
+	     * @param {String} url
+	     */
+	
+	    Url.parse = function (url) {
+	
+	        el.href = url;
+	
+	        return {
+	            href: el.href,
+	            protocol: el.protocol ? el.protocol.replace(/:$/, '') : '',
+	            port: el.port,
+	            host: el.host,
+	            hostname: el.hostname,
+	            pathname: el.pathname.charAt(0) === '/' ? el.pathname : '/' + el.pathname,
+	            search: el.search ? el.search.replace(/^\?/, '') : '',
+	            hash: el.hash ? el.hash.replace(/^#/, '') : ''
+	        };
+	    };
+	
+	    function serialize(params, obj, scope) {
+	
+	        var array = _.isArray(obj), plain = _.isPlainObject(obj), hash;
+	
+	        _.each(obj, function (value, key) {
+	
+	            hash = _.isObject(value) || _.isArray(value);
+	
+	            if (scope) {
+	                key = scope + '[' + (plain || hash ? key : '') + ']';
+	            }
+	
+	            if (!scope && array) {
+	                params.add(value.name, value.value);
+	            } else if (hash) {
+	                serialize(params, value, key);
+	            } else {
+	                params.add(key, value);
+	            }
+	        });
+	    }
+	
+	    function encodeUriSegment(value) {
+	
+	        return encodeUriQuery(value, true).
+	            replace(/%26/gi, '&').
+	            replace(/%3D/gi, '=').
+	            replace(/%2B/gi, '+');
+	    }
+	
+	    function encodeUriQuery(value, spaces) {
+	
+	        return encodeURIComponent(value).
+	            replace(/%40/gi, '@').
+	            replace(/%3A/gi, ':').
+	            replace(/%24/g, '$').
+	            replace(/%2C/gi, ',').
+	            replace(/%20/g, (spaces ? '%20' : '+'));
+	    }
+	
+	    Object.defineProperty(Vue.prototype, '$url', {
+	
+	        get: function () {
+	            return _.extend(Url.bind(this), Url);
+	        }
+	
+	    });
+	
+	    return Url;
+	};
+
+
+/***/ },
+/* 82 */
+/***/ function(module, exports) {
+
+	/**
+	 * Utility functions.
+	 */
+	
+	var _ = exports;
+	
+	_.isArray = Array.isArray;
+	
+	_.isFunction = function (obj) {
+	    return obj && typeof obj === 'function';
+	};
+	
+	_.isObject = function (obj) {
+	    return obj !== null && typeof obj === 'object';
+	};
+	
+	_.isPlainObject = function (obj) {
+	    return Object.prototype.toString.call(obj) === '[object Object]';
+	};
+	
+	_.options = function (key, obj, options) {
+	
+	    var opts = obj.$options || {};
+	
+	    return _.extend({},
+	        opts[key],
+	        options
+	    );
+	};
+	
+	_.each = function (obj, iterator) {
+	
+	    var i, key;
+	
+	    if (typeof obj.length == 'number') {
+	        for (i = 0; i < obj.length; i++) {
+	            iterator.call(obj[i], obj[i], i);
+	        }
+	    } else if (_.isObject(obj)) {
+	        for (key in obj) {
+	            if (obj.hasOwnProperty(key)) {
+	                iterator.call(obj[key], obj[key], key);
+	            }
+	        }
+	    }
+	
+	    return obj;
+	};
+	
+	_.extend = function (target) {
+	
+	    var array = [], args = array.slice.call(arguments, 1), deep;
+	
+	    if (typeof target == 'boolean') {
+	        deep = target;
+	        target = args.shift();
+	    }
+	
+	    args.forEach(function (arg) {
+	        extend(target, arg, deep);
+	    });
+	
+	    return target;
+	};
+	
+	function extend(target, source, deep) {
+	    for (var key in source) {
+	        if (deep && (_.isPlainObject(source[key]) || _.isArray(source[key]))) {
+	            if (_.isPlainObject(source[key]) && !_.isPlainObject(target[key])) {
+	                target[key] = {};
+	            }
+	            if (_.isArray(source[key]) && !_.isArray(target[key])) {
+	                target[key] = [];
+	            }
+	            extend(target[key], source[key], deep);
+	        } else if (source[key] !== undefined) {
+	            target[key] = source[key];
+	        }
+	    }
+	}
+
+
+/***/ },
+/* 83 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Service for sending network requests.
+	 */
+	
+	var _ = __webpack_require__(82);
+	var xhr = __webpack_require__(84);
+	var jsonp = __webpack_require__(86);
+	var Promise = __webpack_require__(85);
+	
+	module.exports = function (Vue) {
+	
+	    var Url = Vue.url;
+	    var originUrl = Url.parse(location.href);
+	    var jsonType = {'Content-Type': 'application/json;charset=utf-8'};
+	
+	    function Http(url, options) {
+	
+	        var promise;
+	
+	        options = options || {};
+	
+	        if (_.isPlainObject(url)) {
+	            options = url;
+	            url = '';
+	        }
+	
+	        options = _.extend(true, {url: url},
+	            Http.options, _.options('http', this, options)
+	        );
+	
+	        if (options.crossOrigin === null) {
+	            options.crossOrigin = crossOrigin(options.url);
+	        }
+	
+	        options.method = options.method.toLowerCase();
+	        options.headers = _.extend({}, Http.headers.common,
+	            !options.crossOrigin ? Http.headers.custom : {},
+	            Http.headers[options.method],
+	            options.headers
+	        );
+	
+	        if (_.isPlainObject(options.data) && /^(get|jsonp)$/i.test(options.method)) {
+	            _.extend(options.params, options.data);
+	            delete options.data;
+	        }
+	
+	        if (options.emulateHTTP && !options.crossOrigin && /^(put|patch|delete)$/i.test(options.method)) {
+	            options.headers['X-HTTP-Method-Override'] = options.method;
+	            options.method = 'post';
+	        }
+	
+	        if (options.emulateJSON && _.isPlainObject(options.data)) {
+	            options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+	            options.data = Url.params(options.data);
+	        }
+	
+	        if (_.isObject(options.data) && /FormData/i.test(options.data.toString())) {
+	            delete options.headers['Content-Type'];
+	        }
+	
+	        if (_.isPlainObject(options.data)) {
+	            options.data = JSON.stringify(options.data);
+	        }
+	
+	        promise = (options.method == 'jsonp' ? jsonp : xhr).call(this, this.$url || Url, options);
+	        promise = extendPromise(promise.then(transformResponse, transformResponse), this);
+	
+	        if (options.success) {
+	            promise = promise.success(options.success);
+	        }
+	
+	        if (options.error) {
+	            promise = promise.error(options.error);
+	        }
+	
+	        return promise;
+	    }
+	
+	    function extendPromise(promise, thisArg) {
+	
+	        promise.success = function (fn) {
+	
+	            return extendPromise(promise.then(function (response) {
+	                return fn.call(thisArg, response.data, response.status, response) || response;
+	            }), thisArg);
+	
+	        };
+	
+	        promise.error = function (fn) {
+	
+	            return extendPromise(promise.then(undefined, function (response) {
+	                return fn.call(thisArg, response.data, response.status, response) || response;
+	            }), thisArg);
+	
+	        };
+	
+	        promise.always = function (fn) {
+	
+	            var cb = function (response) {
+	                return fn.call(thisArg, response.data, response.status, response) || response;
+	            };
+	
+	            return extendPromise(promise.then(cb, cb), thisArg);
+	        };
+	
+	        return promise;
+	    }
+	
+	    function transformResponse(response) {
+	
+	        try {
+	            response.data = JSON.parse(response.responseText);
+	        } catch (e) {
+	            response.data = response.responseText;
+	        }
+	
+	        return response.ok ? response : Promise.reject(response);
+	    }
+	
+	    function crossOrigin(url) {
+	
+	        var requestUrl = Url.parse(url);
+	
+	        return (requestUrl.protocol !== originUrl.protocol || requestUrl.host !== originUrl.host);
+	    }
+	
+	    Http.options = {
+	        method: 'get',
+	        params: {},
+	        data: '',
+	        xhr: null,
+	        jsonp: 'callback',
+	        beforeSend: null,
+	        crossOrigin: null,
+	        emulateHTTP: false,
+	        emulateJSON: false
+	    };
+	
+	    Http.headers = {
+	        put: jsonType,
+	        post: jsonType,
+	        patch: jsonType,
+	        delete: jsonType,
+	        common: {'Accept': 'application/json, text/plain, */*'},
+	        custom: {'X-Requested-With': 'XMLHttpRequest'}
+	    };
+	
+	    ['get', 'put', 'post', 'patch', 'delete', 'jsonp'].forEach(function (method) {
+	
+	        Http[method] = function (url, data, success, options) {
+	
+	            if (_.isFunction(data)) {
+	                options = success;
+	                success = data;
+	                data = undefined;
+	            }
+	
+	            return this(url, _.extend({method: method, data: data, success: success}, options));
+	        };
+	    });
+	
+	    Object.defineProperty(Vue.prototype, '$http', {
+	
+	        get: function () {
+	            return _.extend(Http.bind(this), Http);
+	        }
+	
+	    });
+	
+	    return Http;
+	};
+
+
+/***/ },
+/* 84 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * XMLHttp request.
+	 */
+	
+	var _ = __webpack_require__(82);
+	var Promise = __webpack_require__(85);
+	
+	module.exports = function (url, options) {
+	
+	    var request = new XMLHttpRequest(), promise;
+	
+	    if (_.isPlainObject(options.xhr)) {
+	        _.extend(request, options.xhr);
+	    }
+	
+	    if (_.isFunction(options.beforeSend)) {
+	        options.beforeSend.call(this, request, options);
+	    }
+	
+	    promise = new Promise(function (resolve, reject) {
+	
+	        request.open(options.method, url(options), true);
+	
+	        _.each(options.headers, function (value, header) {
+	            request.setRequestHeader(header, value);
+	        });
+	
+	        request.onreadystatechange = function () {
+	
+	            if (request.readyState === 4) {
+	
+	                request.ok = request.status >= 200 && request.status < 300;
+	
+	                (request.ok ? resolve : reject)(request);
+	            }
+	        };
+	
+	        request.send(options.data);
+	    });
+	
+	    return promise;
+	};
+
+
+/***/ },
+/* 85 */
+/***/ function(module, exports) {
+
+	/**
+	 * Promises/A+ polyfill v1.1.0 (https://github.com/bramstein/promis)
+	 */
+	
+	var RESOLVED = 0;
+	var REJECTED = 1;
+	var PENDING  = 2;
+	
+	function Promise(executor) {
+	
+	    this.state = PENDING;
+	    this.value = undefined;
+	    this.deferred = [];
+	
+	    var promise = this;
+	
+	    try {
+	        executor(function (x) {
+	            promise.resolve(x);
+	        }, function (r) {
+	            promise.reject(r);
+	        });
+	    } catch (e) {
+	        promise.reject(e);
+	    }
+	}
+	
+	Promise.reject = function (r) {
+	    return new Promise(function (resolve, reject) {
+	        reject(r);
+	    });
+	};
+	
+	Promise.resolve = function (x) {
+	    return new Promise(function (resolve, reject) {
+	        resolve(x);
+	    });
+	};
+	
+	Promise.all = function all(iterable) {
+	    return new Promise(function (resolve, reject) {
+	        var count = 0,
+	            result = [];
+	
+	        if (iterable.length === 0) {
+	            resolve(result);
+	        }
+	
+	        function resolver(i) {
+	            return function (x) {
+	                result[i] = x;
+	                count += 1;
+	
+	                if (count === iterable.length) {
+	                    resolve(result);
+	                }
+	            };
+	        }
+	
+	        for (var i = 0; i < iterable.length; i += 1) {
+	            iterable[i].then(resolver(i), reject);
+	        }
+	    });
+	};
+	
+	Promise.race = function race(iterable) {
+	    return new Promise(function (resolve, reject) {
+	        for (var i = 0; i < iterable.length; i += 1) {
+	            iterable[i].then(resolve, reject);
+	        }
+	    });
+	};
+	
+	var p = Promise.prototype;
+	
+	p.resolve = function resolve(x) {
+	    var promise = this;
+	
+	    if (promise.state === PENDING) {
+	        if (x === promise) {
+	            throw new TypeError('Promise settled with itself.');
+	        }
+	
+	        var called = false;
+	
+	        try {
+	            var then = x && x['then'];
+	
+	            if (x !== null && typeof x === 'object' && typeof then === 'function') {
+	                then.call(x, function (x) {
+	                    if (!called) {
+	                        promise.resolve(x);
+	                    }
+	                    called = true;
+	
+	                }, function (r) {
+	                    if (!called) {
+	                        promise.reject(r);
+	                    }
+	                    called = true;
+	                });
+	                return;
+	            }
+	        } catch (e) {
+	            if (!called) {
+	                promise.reject(e);
+	            }
+	            return;
+	        }
+	        promise.state = RESOLVED;
+	        promise.value = x;
+	        promise.notify();
+	    }
+	};
+	
+	p.reject = function reject(reason) {
+	    var promise = this;
+	
+	    if (promise.state === PENDING) {
+	        if (reason === promise) {
+	            throw new TypeError('Promise settled with itself.');
+	        }
+	
+	        promise.state = REJECTED;
+	        promise.value = reason;
+	        promise.notify();
+	    }
+	};
+	
+	p.notify = function notify() {
+	    var promise = this;
+	
+	    async(function () {
+	        if (promise.state !== PENDING) {
+	            while (promise.deferred.length) {
+	                var deferred = promise.deferred.shift(),
+	                    onResolved = deferred[0],
+	                    onRejected = deferred[1],
+	                    resolve = deferred[2],
+	                    reject = deferred[3];
+	
+	                try {
+	                    if (promise.state === RESOLVED) {
+	                        if (typeof onResolved === 'function') {
+	                            resolve(onResolved.call(undefined, promise.value));
+	                        } else {
+	                            resolve(promise.value);
+	                        }
+	                    } else if (promise.state === REJECTED) {
+	                        if (typeof onRejected === 'function') {
+	                            resolve(onRejected.call(undefined, promise.value));
+	                        } else {
+	                            reject(promise.value);
+	                        }
+	                    }
+	                } catch (e) {
+	                    reject(e);
+	                }
+	            }
+	        }
+	    });
+	};
+	
+	p.catch = function (onRejected) {
+	    return this.then(undefined, onRejected);
+	};
+	
+	p.then = function then(onResolved, onRejected) {
+	    var promise = this;
+	
+	    return new Promise(function (resolve, reject) {
+	        promise.deferred.push([onResolved, onRejected, resolve, reject]);
+	        promise.notify();
+	    });
+	};
+	
+	var queue = [];
+	var async = function (callback) {
+	    queue.push(callback);
+	
+	    if (queue.length === 1) {
+	        async.async();
+	    }
+	};
+	
+	async.run = function () {
+	    while (queue.length) {
+	        queue[0]();
+	        queue.shift();
+	    }
+	};
+	
+	if (window.MutationObserver) {
+	    var el = document.createElement('div');
+	    var mo = new MutationObserver(async.run);
+	
+	    mo.observe(el, {
+	        attributes: true
+	    });
+	
+	    async.async = function () {
+	        el.setAttribute("x", 0);
+	    };
+	} else {
+	    async.async = function () {
+	        setTimeout(async.run);
+	    };
+	}
+	
+	module.exports = window.Promise || Promise;
+
+
+/***/ },
+/* 86 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * JSONP request.
+	 */
+	
+	var _ = __webpack_require__(82);
+	var Promise = __webpack_require__(85);
+	
+	module.exports = function (url, options) {
+	
+	    var callback = '_jsonp' + Math.random().toString(36).substr(2), response = {}, script, body;
+	
+	    options.params[options.jsonp] = callback;
+	
+	    if (_.isFunction(options.beforeSend)) {
+	        options.beforeSend.call(this, {}, options);
+	    }
+	
+	    return new Promise(function (resolve, reject) {
+	
+	        script = document.createElement('script');
+	        script.src = url(options.url, options.params);
+	        script.type = 'text/javascript';
+	        script.async = true;
+	
+	        window[callback] = function (data) {
+	            body = data;
+	        };
+	
+	        var handler = function (event) {
+	
+	            delete window[callback];
+	            document.body.removeChild(script);
+	
+	            if (event.type === 'load' && !body) {
+	                event.type = 'error';
+	            }
+	
+	            response.ok = event.type !== 'error';
+	            response.status = response.ok ? 200 : 404;
+	            response.responseText = body ? body : event.type;
+	
+	            (response.ok ? resolve : reject)(response);
+	        };
+	
+	        script.onload = handler;
+	        script.onerror = handler;
+	
+	        document.body.appendChild(script);
+	    });
+	
+	};
+
+
+/***/ },
+/* 87 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Service for interacting with RESTful services.
+	 */
+	
+	var _ = __webpack_require__(82);
+	
+	module.exports = function (Vue) {
+	
+	    function Resource(url, params, actions) {
+	
+	        var self = this, resource = {};
+	
+	        actions = _.extend({},
+	            Resource.actions,
+	            actions
+	        );
+	
+	        _.each(actions, function (action, name) {
+	
+	            action = _.extend(true, {url: url, params: params || {}}, action);
+	
+	            resource[name] = function () {
+	                return (self.$http || Vue.http)(opts(action, arguments));
+	            };
+	        });
+	
+	        return resource;
+	    }
+	
+	    function opts(action, args) {
+	
+	        var options = _.extend({}, action), params = {}, data, success, error;
+	
+	        switch (args.length) {
+	
+	            case 4:
+	
+	                error = args[3];
+	                success = args[2];
+	
+	            case 3:
+	            case 2:
+	
+	                if (_.isFunction (args[1])) {
+	
+	                    if (_.isFunction (args[0])) {
+	
+	                        success = args[0];
+	                        error = args[1];
+	
+	                        break;
+	                    }
+	
+	                    success = args[1];
+	                    error = args[2];
+	
+	                } else {
+	
+	                    params = args[0];
+	                    data = args[1];
+	                    success = args[2];
+	
+	                    break;
+	                }
+	
+	            case 1:
+	
+	                if (_.isFunction (args[0])) {
+	                    success = args[0];
+	                } else if (/^(post|put|patch)$/i.test(options.method)) {
+	                    data = args[0];
+	                } else {
+	                    params = args[0];
+	                }
+	
+	                break;
+	
+	            case 0:
+	
+	                break;
+	
+	            default:
+	
+	                throw 'Expected up to 4 arguments [params, data, success, error], got ' + args.length + ' arguments';
+	        }
+	
+	        options.url = action.url;
+	        options.data = data;
+	        options.params = _.extend({}, action.params, params);
+	
+	        if (success) {
+	            options.success = success;
+	        }
+	
+	        if (error) {
+	            options.error = error;
+	        }
+	
+	        return options;
+	    }
+	
+	    Resource.actions = {
+	
+	        get: {method: 'get'},
+	        save: {method: 'post'},
+	        query: {method: 'get'},
+	        update: {method: 'put'},
+	        remove: {method: 'delete'},
+	        delete: {method: 'delete'}
+	
+	    };
+	
+	    Object.defineProperty(Vue.prototype, '$resource', {
+	
+	        get: function () {
+	            return Resource.bind(this);
+	        }
+	
+	    });
+	
+	    return Resource;
+	};
+
+
+/***/ },
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -11963,7 +12944,7 @@
 
 
 /***/ },
-/* 81 */
+/* 89 */
 /***/ function(module, exports) {
 
 	module.exports = [
@@ -12620,16 +13601,16 @@
 	]
 
 /***/ },
-/* 82 */
+/* 90 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"rangeValue\" v-redraw=\"availWidth\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this)\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.name\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
+	module.exports = "<div class=\"grid-wrap\">\r\n\t\t<div class=\"grid\" v-style=\"height: rows * (rangeValue * 286 + 42)  - 42 + 'px';\">\r\n\t\t\t<div class=\"grid-item\" style=\"background-image: url({{data.url}});\" data-index=\"{{$index}}\" v-style=\"width: rangeValue * 161 + 'px', height: rangeValue * 161 * 286 / 161 + 'px'\" v-render=\"{zoom: rangeValue, availWidth: availWidth}\" v-repeat=\"data in lists | filterBy filterText in 'name'\" v-on=\"mousedown: dragStart($event, this), mouseup: dragEnd\" v-drag-start=\"this === dragTarget\" v-drag-end=\"dragEndStatus\">\r\n\t\t\t\t<span class=\"grid-text\" v-text=\"data.name\"></span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</div>";
 
 /***/ },
-/* 83 */
+/* 91 */
 /***/ function(module, exports) {
 
-	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<iframe src=\"https://ghbtns.com/github-btn.html?user=ihanyang&repo=Absolute-Grid&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe>\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
+	module.exports = "<div class=\"wrap\">\r\n\t\t<h1 class=\"title\">Absolute Grid</h1>\r\n\t\t<p class=\"desc\">\r\n\t\t\tSortable, filterable, zoomable, grid component using an absolute transform3d layout for Vue.js.\r\n\t\t\t<a href=\"https://github.com/ihanyang/Absolute-Grid\" target=\"_blank\">Read more here</a>\r\n\t\t</p>\r\n\t\t<!-- <iframe src=\"https://ghbtns.com/github-btn.html?user=ihanyang&repo=Absolute-Grid&type=star&count=true&size=large\" frameborder=\"0\" scrolling=\"0\" width=\"160px\" height=\"30px\"></iframe> -->\r\n\t\t<div class=\"operation\">\r\n\t\t\t<input type=\"text\" class=\"filter\" placeholder=\"filter eg: login\" v-model=\"filterValue\" />\r\n\t\t\t<input type=\"range\" min=\"0.5\" max=\"1.5\" step=\"0.1\" v-model=\"range\" />\r\n\t\t</div>\r\n\t\t<grid filter-text=\"{{filterValue}}\" range-value=\"{{range}}\"></grid>\r\n\t</div>";
 
 /***/ }
 /******/ ]);
