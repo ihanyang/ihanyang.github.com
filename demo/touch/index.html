@@ -17,8 +17,8 @@
 		width: 100%;
 	}
 	#app {
-		width: 414px;
-		height: 414px;
+		/* width: 100%; */
+		height: 100vw;
 		margin: 0px auto;
 		/* border: 1px solid teal; */
 	}
@@ -68,13 +68,15 @@
 			app.pinch2X = e.touches[1].pageX
 			app.pinch2Y = e.touches[1].pageY
 
-			let x = Math.abs(app.pinch2X - app.pinch1X)
-			let y = Math.abs(app.pinch2Y - app.pinch1Y)
+			if (e.touches.length === 2) {
+				let x = Math.abs(app.pinch2X - app.pinch1X)
+				let y = Math.abs(app.pinch2Y - app.pinch1Y)
 
-			let = disance = Math.sqrt(x * x + y * y)
-			let scale = disance / app.disance
+				let = disance = Math.sqrt(x * x + y * y)
+				let scale = disance / app.disance
 
-			app.style.transform = `scale(${scale})`
+				app.style.transform = "scale(" + scale + ")"
+			}
 		}, false)
 
 		app.addEventListener("touchend", (e) => {
