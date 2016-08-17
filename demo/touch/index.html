@@ -103,7 +103,7 @@
 			}
 
 			if (endTime - startTime <= 200) {
-				if (Math.abs(startX - endX) > 50 && Math.abs(startY - endY) < 20) {
+				if (Math.abs(startX - endX) > 50 && Math.abs(startY - endY) < 50) {
 					if (startX - endX > 0) {
 						console.log("swipeLeft 事件触发了")
 						p.innerHTML = "swipeLeft 事件触发了"
@@ -115,7 +115,7 @@
 					}
 				}
 
-				if (Math.abs(startY - endY) > 50 && Math.abs(startX - endX) < 20) {
+				if (Math.abs(startY - endY) > 50 && Math.abs(startX - endX) < 50) {
 					if (startY - endY > 0) {
 						console.log("swipeUp 事件触发了")
 						p.innerHTML = "swipeUp 事件触发了"
