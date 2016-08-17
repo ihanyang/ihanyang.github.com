@@ -65,6 +65,8 @@
 				var y = Math.abs(app.pinch2Y - app.pinch1Y)
 
 				app.disance = Math.sqrt(x * x + y * y)
+
+				clearTimeout(app.timer)
 			}
 		}, false)
 
