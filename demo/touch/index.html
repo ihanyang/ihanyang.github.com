@@ -86,7 +86,7 @@
 				var disance = Math.sqrt(x * x + y * y)
 				var scale = disance / app.disance
 
-				scale = scale * (img.style.transform.match(/\d\.\d+/)[0])
+				img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
 
 				img.style.transform = "scale(" + scale + ")"
 			}
