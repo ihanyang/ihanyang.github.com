@@ -51,7 +51,7 @@
 			app.timer = setTimeout (function() {
 				console.log("长按触发了")
 				p.innerHTML = "长按触发了"
-			}, 1000)
+			}, 800)
 
 			// pinch
 			if (e.touches.length === 2) {
@@ -135,7 +135,7 @@
 				}
 			}
 
-			if (endTime - startTime < 1000) {
+			if (endTime - startTime < 800) {
 				clearTimeout(app.timer)
 			}
 		}, false)
