@@ -40,14 +40,14 @@
 			img = document.querySelector("img"),
 			p = document.querySelector("p")
 
-		app.addEventListener("touchstart", (e) => {
+		app.addEventListener("touchstart", function(e) {
 			app.startTime = Date.now()
 
 			app.startX = e.touches[0].pageX
 			app.startY = e.touches[0].pageY
 
 			// 长按
-			app.timer = setTimeout(() => {
+			app.timer = setTimeout (function() {
 				console.log("长按触发了")
 				p.innerHTML = "长按触发了"
 			}, 1000)
@@ -67,7 +67,7 @@
 			}
 		}, false)
 
-		app.addEventListener("touchmove", (e) => {
+		app.addEventListener("touchmove", function(e) {
 			clearTimeout(app.timer)
 
 			app.pinch1X = e.touches[0].pageX
@@ -87,7 +87,7 @@
 			}
 		}, false)
 
-		app.addEventListener("touchend", (e) => {
+		app.addEventListener("touchend", function(e) {
 			var startTime = app.startTime
 			var endTime = Date.now()
 
