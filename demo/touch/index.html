@@ -35,7 +35,7 @@
 	<p></p>
 
 	<script>
-		let app = document.querySelector("#app"),
+		var app = document.querySelector("#app"),
 			img = document.querySelector("img"),
 			p = document.querySelector("p")
 
@@ -59,8 +59,8 @@
 				app.pinch2X = e.touches[1].pageX
 				app.pinch2Y = e.touches[1].pageY
 
-				let x = Math.abs(app.pinch2X - app.pinch1X)
-				let y = Math.abs(app.pinch2Y - app.pinch1Y)
+				var x = Math.abs(app.pinch2X - app.pinch1X)
+				var y = Math.abs(app.pinch2Y - app.pinch1Y)
 
 				app.disance = Math.sqrt(x * x + y * y)
 			}
@@ -76,25 +76,25 @@
 			app.pinch2Y = e.touches[1].pageY
 
 			if (e.touches.length === 2) {
-				let x = Math.abs(app.pinch2X - app.pinch1X)
-				let y = Math.abs(app.pinch2Y - app.pinch1Y)
+				var x = Math.abs(app.pinch2X - app.pinch1X)
+				var y = Math.abs(app.pinch2Y - app.pinch1Y)
 
-				let = disance = Math.sqrt(x * x + y * y)
-				let scale = disance / app.disance
+				var = disance = Math.sqrt(x * x + y * y)
+				var scale = disance / app.disance
 
 				img.style.transform = "scale(" + scale + ")"
 			}
 		}, false)
 
 		app.addEventListener("touchend", (e) => {
-			let startTime = app.startTime
-			let endTime = Date.now()
+			var startTime = app.startTime
+			var endTime = Date.now()
 
-			let startX = app.startX
-			let startY = app.startY
+			var startX = app.startX
+			var startY = app.startY
 
-			let endX = e.changedTouches[0].pageX
-			let endY = e.changedTouches[0].pageY
+			var endX = e.changedTouches[0].pageX
+			var endY = e.changedTouches[0].pageY
 
 			if (endTime - startTime <= 300) {
 				if (Math.abs(endX - startX) <= 10 && Math.abs(endY - startY) <= 20) {
