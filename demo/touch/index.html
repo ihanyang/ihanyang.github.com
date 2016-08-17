@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#F14382"/>
+<meta name="msapplication-TileColor" content="#f14382">
+<meta name="application-name" content="Chrome11111111111111">
+<title>touch</title>
+<style>
+	body, div {
+		padding: 0;
+		margin: 0;
+	}
+	img {
+		display: block;
+		width: 100%;
+	}
+	#app {
+		width: 414px;
+		height: 414px;
+		margin: 0px auto;
+		/* border: 1px solid teal; */
+	}
+</style>
+</head>
+<body>
+	<div id="app">
+		<img src="./mao.jpg">
+	</div>
+
+	<script>
+		let app = document.querySelector("#app"),
+			img = document.querySelector("img")
+
+		app.addEventListener("touchstart", (e) => {
+			app.startTime = Date.now()
+
+			app.startX = e.touches[0].pageX
+			app.startY = e.touches[0].pageY
+
+			// 长按
+			app.timer = setTimeout(() => {
+				console.log("长按触发了")
+			}, 1000)
+
+			// pinch
+			if (e.touches.length === 2) {
+				app.pinch1X = e.touches[0].pageX
+				app.pinch1Y = e.touches[0].pageY
+
+				app.pinch2X = e.touches[1].pageX
+				app.pinch2Y = e.touches[1].pageY
+
+				let x = Math.abs(app.pinch2X - app.pinch1X)
+				let y = Math.abs(app.pinch2Y - app.pinch1Y)
+
+				app.disance = Math.sqrt(x * x + y * y)
+			}
+		}, false)
+
+		app.addEventListener("touchmove", (e) => {
+			clearTimeout(app.timer)
+
+			app.pinch1X = e.touches[0].pageX
+			app.pinch1Y = e.touches[0].pageY
+
+			app.pinch2X = e.touches[1].pageX
+			app.pinch2Y = e.touches[1].pageY
+
+			let x = Math.abs(app.pinch2X - app.pinch1X)
+			let y = Math.abs(app.pinch2Y - app.pinch1Y)
+
+			let = disance = Math.sqrt(x * x + y * y)
+			let scale = disance / app.disance
+
+			app.style.transform = `scale(${scale})`
+		}, false)
+
+		app.addEventListener("touchend", (e) => {
+			let startTime = app.startTime
+			let endTime = Date.now()
+
+			let startX = app.startX
+			let startY = app.startY
+
+			let endX = e.changedTouches[0].pageX
+			let endY = e.changedTouches[0].pageY
+
+			if (endTime - startTime <= 300) {
+				if (Math.abs(endX - startX) <= 10 && Math.abs(endY - startY) <= 20) {
+					console.log("tap 事件触发了")
+				}
+			}
+
+			if (endTime - startTime <= 200) {
+				if (Math.abs(startX - endX) > 50 && Math.abs(startY - endY) < 20) {
+					if (startX - endX > 0) {
+						console.log("swipeLeft 事件触发了")
+					}
+
+					if (startX - endX < 0) {
+						console.log("swipeRight 事件触发了")
+					}
+				}
+
+				if (Math.abs(startY - endY) > 50 && Math.abs(startX - endX) < 20) {
+					if (startY - endY > 0) {
+						console.log("swipeUp 事件触发了")
+					}
+
+					if (startY - endY < 0) {
+						console.log("swipeDown 事件触发了")
+					}
+				}
+			}
+
+			if (endTime - startTime < 1000) {
+				clearTimeout(app.timer)
+			}
+		}, false)
+	</script>
+</body>
+</html>
