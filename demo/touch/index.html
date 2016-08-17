@@ -42,6 +42,7 @@
 			p = document.querySelector("p")
 
 		app.addEventListener("touchstart", function(e) {
+			app.scale = 1
 			app.startTime = Date.now()
 
 			app.startX = e.touches[0].pageX
@@ -85,10 +86,13 @@
 
 				var disance = Math.sqrt(x * x + y * y)
 				var scale = disance / app.disance
+				var previousScale = app.scale
 
-				img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
+				//img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
 
-				img.style.transform = "scale(" + scale + ")"
+				img.style.transform = "scale(" + (scale - previousScale) + ")"
+
+				app.scale = scale
 			}
 
 			e.preventDefault()
