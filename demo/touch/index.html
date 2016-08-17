@@ -22,16 +22,21 @@
 		margin: 0px auto;
 		/* border: 1px solid teal; */
 	}
+	p {
+		margin: 20px auto;
+	}
 </style>
 </head>
 <body>
 	<div id="app">
 		<img src="./mao.jpg">
 	</div>
+	<p></p>
 
 	<script>
 		let app = document.querySelector("#app"),
-			img = document.querySelector("img")
+			img = document.querySelector("img"),
+			p = document.querySelector("p")
 
 		app.addEventListener("touchstart", (e) => {
 			app.startTime = Date.now()
@@ -42,6 +47,7 @@
 			// 长按
 			app.timer = setTimeout(() => {
 				console.log("长按触发了")
+				p.innerHTML = "长按触发了"
 			}, 1000)
 
 			// pinch
@@ -92,6 +98,7 @@
 			if (endTime - startTime <= 300) {
 				if (Math.abs(endX - startX) <= 10 && Math.abs(endY - startY) <= 20) {
 					console.log("tap 事件触发了")
+					p.innerHTML = "tap 事件触发了"
 				}
 			}
 
@@ -99,20 +106,24 @@
 				if (Math.abs(startX - endX) > 50 && Math.abs(startY - endY) < 20) {
 					if (startX - endX > 0) {
 						console.log("swipeLeft 事件触发了")
+						p.innerHTML = "swipeLeft 事件触发了"
 					}
 
 					if (startX - endX < 0) {
 						console.log("swipeRight 事件触发了")
+						p.innerHTML = "swipeRight 事件触发了"
 					}
 				}
 
 				if (Math.abs(startY - endY) > 50 && Math.abs(startX - endX) < 20) {
 					if (startY - endY > 0) {
 						console.log("swipeUp 事件触发了")
+						p.innerHTML = "swipeUp 事件触发了"
 					}
 
 					if (startY - endY < 0) {
 						console.log("swipeDown 事件触发了")
+						p.innerHTML = "swipeDown 事件触发了"
 					}
 				}
 			}
