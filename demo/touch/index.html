@@ -95,13 +95,12 @@
 
 				//img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
 
-				scale = scale + (ratio - prevScale)
-				img.style.transform = "scale(" + scale + ")"
+				//scale = scale + (ratio - prevScale)
+				img.style.transform = "scale(" + (scale * ratio) + ")"
 
 				//app.scale = scale
 				//alert(ratio)
 				prevScale = ratio
-				scale = 1
 				p.innerHTML = 'scale: ' + scale + '\r\n' + 'prevScale: ' + prevScale + '\r\n' + 'ratio: ' + ratio
 			}
 
