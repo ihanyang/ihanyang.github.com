@@ -89,6 +89,7 @@
 				var y = Math.abs(app.pinch2Y - app.pinch1Y)
 
 				var disance = Math.sqrt(x * x + y * y)
+
 				var ratio = (disance / app.disance)
 				//var scale = img.style.transform ? img.style.transform.match(/\d\.\d+/)[0] : 0
 
@@ -100,7 +101,7 @@
 				//app.scale = scale
 				//alert(ratio)
 				prevScale = ratio
-				p.innerHTML = scale
+				p.innerHTML = 'scale: ' + scale + '\n' + 'prevScale: ' + prevScale + '\n' + 'ratio: ' + ratio
 			}
 
 			e.preventDefault()
