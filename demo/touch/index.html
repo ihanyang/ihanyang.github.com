@@ -52,6 +52,8 @@
 			app.timer = setTimeout (function() {
 				console.log("长按触发了")
 				p.innerHTML = "长按触发了"
+
+				e.preventDefault()
 			}, 800)
 
 			// pinch
@@ -77,20 +79,20 @@
 			app.pinch1X = e.touches[0].pageX
 			app.pinch1Y = e.touches[0].pageY
 
-			app.pinch2X = e.touches[1].pageX
-			app.pinch2Y = e.touches[1].pageY
-
 			if (e.touches.length === 2) {
+				app.pinch2X = e.touches[1].pageX
+				app.pinch2Y = e.touches[1].pageY
+
 				var x = Math.abs(app.pinch2X - app.pinch1X)
 				var y = Math.abs(app.pinch2Y - app.pinch1Y)
 
 				var disance = Math.sqrt(x * x + y * y)
 				var scale = disance / app.disance
-				var previousScale = app.scale
+				//var previousScale = app.scale
 
-				//img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
+				img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
 
-				img.style.transform = "scale(" + (scale - previousScale) + ")"
+				img.style.transform = "scale(" + scale + ")"
 
 				app.scale = scale
 			}
