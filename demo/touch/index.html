@@ -168,17 +168,15 @@ iframe.style.cssText='display:none;width=0;height=0';
 var timer = null;
 
 // 立即打开的按钮
-var openapp = document.getElementById('openapp');
+var openapp = document.getElementById('app');
 openapp.addEventListener('click', function() {
-  if(/MicroMessenger/gi.test(navigator.userAgent) {
-    // 引导用户在浏览器中打开
-  }) else{
+
     body.appendChild(iframe);
     iframe.src = url.open;
     timer = setTimeout(function() {
       wondow.location.href = url.down;
     }, 500);
-  }
+
 }, false)
 
 document.addEventListener('visibilitychange', function() {
