@@ -87,12 +87,12 @@
 				var y = Math.abs(app.pinch2Y - app.pinch1Y)
 
 				var disance = Math.sqrt(x * x + y * y)
-				var scale = disance / app.disance
-				//var previousScale = app.scale
+				var ratio = disance / app.disance
+				var scale = img.style.transform ? img.style.transform.match(/\d\.\d+/)[0]) : 1
 
-				img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
+				//img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
 
-				img.style.transform = "scale(" + scale + ")"
+				img.style.transform = "scale(" + (ratio - scale) + ")"
 
 				//app.scale = scale
 				p.innerHTML = scale
