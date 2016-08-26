@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#F14382"/>
 <meta name="msapplication-TileColor" content="#f14382">
 <meta name="application-name" content="Chrome11111111111111">
@@ -14,181 +14,207 @@
 	}
 	img {
 		display: block;
-		width: 70%;
-		margin: 0 auto;
+		width: 100%;
 	}
 	#app {
 		/* width: 100%; */
-		height: 100vw;
+		height: 100vh;
 		margin: 0px auto;
-		overflow: hidden;
+		position: relative;
 		/* border: 1px solid teal; */
-		background-color: #EEE;
 	}
-	p {
-		margin: 20px auto;
+	.panel {
+		width: 400px;
+		height: 100px;
+		position: absolute;
+		top: 0;
+		left: 0;
+		/* will-change: transform; */
+		background-color: teal;
+	}
+
+	::selection {
+		background-color: teal;
 	}
 </style>
 </head>
 <body>
 	<div id="app">
-		<img src="./mao.jpg">
+		<!-- <img src="./mao.jpg"> -->
+		<div class="panel">黄山晚霞的最佳地点是西海的排云亭和丹霞峰。黄山是云雾之乡，一年中200天有云雾。看云海，以玉屏楼观前海、清凉台观后海、白鹅岭观东海、排云亭看西海、光明顶看天海最宜。</div>
 	</div>
-	<p></p>
 
 	<script>
-		var app = document.querySelector("#app"),
-			img = document.querySelector("img"),
-			p = document.querySelector("p"),
-			scale = 1,
-			prevScale = 1
+		let app = document.querySelector("#app"),
+			panel = document.querySelector(".panel"),
+			x = 0,
+			y = 0,
+			timer = null
 
-		app.addEventListener("touchstart", function(e) {
-			app.scale = 1
-			app.startTime = Date.now()
-
-			app.startX = e.touches[0].pageX
-			app.startY = e.touches[0].pageY
-
-			// 长按
-			app.timer = setTimeout (function() {
-				console.log("长按触发了")
-				p.innerHTML = "长按触发了"
-
-				e.preventDefault()
-			}, 800)
-
-			// pinch
-			if (e.touches.length === 2) {
-				app.pinch1X = e.touches[0].pageX
-				app.pinch1Y = e.touches[0].pageY
-
-				app.pinch2X = e.touches[1].pageX
-				app.pinch2Y = e.touches[1].pageY
-
-				var x = Math.abs(app.pinch2X - app.pinch1X)
-				var y = Math.abs(app.pinch2Y - app.pinch1Y)
-
-				app.disance = Math.sqrt(x * x + y * y)
-
-				clearTimeout(app.timer)
-			}
-		}, false)
-
-		app.addEventListener("touchmove", function(e) {
-			clearTimeout(app.timer)
-
-			app.pinch1X = e.touches[0].pageX
-			app.pinch1Y = e.touches[0].pageY
-
-			if (e.touches.length === 2) {
-				app.pinch2X = e.touches[1].pageX
-				app.pinch2Y = e.touches[1].pageY
-
-				var x = Math.abs(app.pinch2X - app.pinch1X)
-				var y = Math.abs(app.pinch2Y - app.pinch1Y)
-
-				var disance = Math.sqrt(x * x + y * y)
-
-				var ratio = (disance / app.disance)
-				//var scale = img.style.transform ? img.style.transform.match(/\d\.\d+/)[0] : 0
-
-				//img.style.transform && (scale = scale * (img.style.transform.match(/\d\.\d+/)[0]))
-
-				scale = scale + (ratio - prevScale)
-				img.style.transform = "scale(" + scale + ")"
-
-				//app.scale = scale
-				//alert(ratio)
-				prevScale = ratio
-				p.innerHTML = 'scale: ' + scale + '\r\n' + 'prevScale: ' + prevScale + '\r\n' + 'ratio: ' + ratio
-			}
-
-			e.preventDefault()
-		}, false)
-
-		app.addEventListener("touchend", function(e) {
-			var startTime = app.startTime
-			var endTime = Date.now()
-
-			var startX = app.startX
-			var startY = app.startY
-
-			var endX = e.changedTouches[0].pageX
-			var endY = e.changedTouches[0].pageY
-
-			if (endTime - startTime <= 300) {
-				if (Math.abs(endX - startX) <= 10 && Math.abs(endY - startY) <= 20) {
-					console.log("tap 事件触发了")
-					p.innerHTML = "tap 事件触发了"
-				}
-			}
-
-			if (endTime - startTime <= 200) {
-				if (Math.abs(startX - endX) > 50 && Math.abs(startY - endY) < 50) {
-					if (startX - endX > 0) {
-						console.log("swipeLeft 事件触发了")
-						p.innerHTML = "swipeLeft 事件触发了"
-					}
-
-					if (startX - endX < 0) {
-						console.log("swipeRight 事件触发了")
-						p.innerHTML = "swipeRight 事件触发了"
-					}
-				}
-
-				if (Math.abs(startY - endY) > 50 && Math.abs(startX - endX) < 50) {
-					if (startY - endY > 0) {
-						console.log("swipeUp 事件触发了")
-						p.innerHTML = "swipeUp 事件触发了"
-					}
-
-					if (startY - endY < 0) {
-						console.log("swipeDown 事件触发了")
-						p.innerHTML = "swipeDown 事件触发了"
-					}
-				}
-			}
-
-			if (endTime - startTime < 800) {
-				clearTimeout(app.timer)
-			}
-
-			prevScale = 1
-		}, false)
+		document.addEventListener("click" , () => {
+			// ! x ? (timer = setInterval(() => {
+			// 	panel.style.top = ++y + "px"
+			// 	panel.style.left = ++x + "px"
+			// }, 50)) : clearInterval(timer)
 
 
-		var url = {
-  open: 'bilibili://xxxxx',
-  down: 'xxxxxxxx'
-};
-var iframe = document.createElement('iframe');
-var body = document.body;
-iframe.style.cssText='display:none;width=0;height=0';
-var timer = null;
+			// ! x ? (timer = setInterval(() => {
+			// 	panel.style.transform = `translate3d(${++x}px, ${++y}px, 0)`
+			// 	//panel.style. = ++x + "px"
+			// }, 50)) : clearInterval(timer)
 
-// 立即打开的按钮
-var openapp = document.getElementById('app');
-openapp.addEventListener('click', function() {
+			// requestAnimationFrame(function step() {
+			// 	//panel.style.transform = `translate3d(${++x}px, ${++y}px, 0)`
+			// 		panel.style.top = ++y + "px"
+			// 		panel.style.left = ++x + "px"
 
-    body.appendChild(iframe);
-    iframe.src = url.open;
-    timer = setTimeout(function() {
-      window.location.href = url.down;
-    }, 3000);
+			// 	if (x < 500) {
+			// 		requestAnimationFrame(step)
+			// 	}
+			// })
+			var selection = getSelection()
+			var range = document.createRange()
 
-}, false)
+			range.selectNode(panel)
 
-document.addEventListener('visibilitychange', function() {
-    var tag = document.hidden || document.webkitHidden;
-    if (tag) {
-        clearTimeout(timer);
-    }
-})
+			selection.addRange(range)
 
-window.addEventListener('pagehide', function() {
-    clearTimeout(timer);
-})
+			document.execCommand("copy")
+
+		} ,false);
+
+
+		// let app = document.querySelector("#app"),
+		// 	img = document.querySelector("img")
+
+		// app.addEventListener("touchstart", (e) => {
+		// 	app.startTime = Date.now()
+
+		// 	app.startX = e.touches[0].pageX
+		// 	app.startY = e.touches[0].pageY
+
+		// 	// 长按
+		// 	app.timer = setTimeout(() => {
+		// 		console.log("长按触发了")
+		// 	}, 1000)
+
+		// 	// pinch
+		// 	if (e.touches.length === 2) {
+		// 		app.pinch1X = e.touches[0].pageX
+		// 		app.pinch1Y = e.touches[0].pageY
+
+		// 		app.pinch2X = e.touches[1].pageX
+		// 		app.pinch2Y = e.touches[1].pageY
+
+		// 		let x = Math.abs(app.pinch2X - app.pinch1X)
+		// 		let y = Math.abs(app.pinch2Y - app.pinch1Y)
+
+		// 		app.disance = Math.sqrt(x * x + y * y)
+		// 	}
+		// }, false)
+
+		// app.addEventListener("touchmove", (e) => {
+		// 	clearTimeout(app.timer)
+
+		// 	app.pinch1X = e.touches[0].pageX
+		// 	app.pinch1Y = e.touches[0].pageY
+
+		// 	app.pinch2X = e.touches[1].pageX
+		// 	app.pinch2Y = e.touches[1].pageY
+
+		// 	if (e.touches.length === 2) {
+		// 		let x = Math.abs(app.pinch2X - app.pinch1X)
+		// 		let y = Math.abs(app.pinch2Y - app.pinch1Y)
+
+		// 		let = disance = Math.sqrt(x * x + y * y)
+		// 		let scale = disance / app.disance
+
+		// 		app.style.transform = "scale(" + scale + ")"
+		// 	}
+		// }, false)
+
+		// app.addEventListener("touchend", (e) => {
+		// 	let startTime = app.startTime
+		// 	let endTime = Date.now()
+
+		// 	let startX = app.startX
+		// 	let startY = app.startY
+
+		// 	let endX = e.changedTouches[0].pageX
+		// 	let endY = e.changedTouches[0].pageY
+
+		// 	if (endTime - startTime <= 300) {
+		// 		if (Math.abs(endX - startX) <= 10 && Math.abs(endY - startY) <= 20) {
+		// 			console.log("tap 事件触发了")
+		// 		}
+		// 	}
+
+		// 	if (endTime - startTime <= 200) {
+		// 		if (Math.abs(startX - endX) > 50 && Math.abs(startY - endY) < 20) {
+		// 			if (startX - endX > 0) {
+		// 				console.log("swipeLeft 事件触发了")
+		// 			}
+
+		// 			if (startX - endX < 0) {
+		// 				console.log("swipeRight 事件触发了")
+		// 			}
+		// 		}
+
+		// 		if (Math.abs(startY - endY) > 50 && Math.abs(startX - endX) < 20) {
+		// 			if (startY - endY > 0) {
+		// 				console.log("swipeUp 事件触发了")
+		// 			}
+
+		// 			if (startY - endY < 0) {
+		// 				console.log("swipeDown 事件触发了")
+		// 			}
+		// 		}
+		// 	}
+
+		// 	if (endTime - startTime < 1000) {
+		// 		clearTimeout(app.timer)
+		// 	}
+		// }, false)
+
+
+
+
+
+
+
+		// var search = location.search.slice(1)
+		// var hash = {}
+
+		// search.replace(/([^=&]+)=([^&]+)/, (match, key, value) => {
+		// 	hash[key] = value
+		// })
+
+		// console.log(hash)
+
+
+		// var hash = {
+		// 	a: 1,
+		// 	b: 2,
+		// 	c: 3
+		// }
+		// var result = []
+
+		// Object.keys(hash).forEach((key) => {
+		// 	result.push(`${key}=${hash[key]}`)
+		// })
+
+		// console.log(result.join('&'))
+
+
+		function timeout(ms) {
+		  return new Promise((resolve, reject) => {
+		    setTimeout(resolve, ms, 'done');
+		  });
+		}
+
+		timeout(1000).then((value) => {
+		  document.body.insertAdjacentHTML("beforebegin", "<h1>hello hanyang</h1>")
+		});
 	</script>
 </body>
 </html>
