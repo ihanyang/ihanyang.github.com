@@ -10787,7 +10787,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n.container {\n\twidth: 300px;\n\tmargin: 50px auto;\n\tposition: relative;\n}\n.date-editor {\n\tpadding: 5px 10px;\n\tborder-radius: 2px;\n\tborder: 1px solid #CCC;\n}\n.date-editor:focus {\n\tborder-color: #20A0FF;\n}\n", "", {"version":3,"sources":["/./src/app.vue?67d13b64"],"names":[],"mappings":";AACA;CACA,aAAA;CACA,kBAAA;CACA,mBAAA;CACA;AACA;CACA,kBAAA;CACA,mBAAA;CACA,uBAAA;CACA;AACA;CACA,sBAAA;CACA","file":"app.vue","sourcesContent":["<style>\r\n\t.container {\r\n\t\twidth: 300px;\r\n\t\tmargin: 50px auto;\r\n\t\tposition: relative;\r\n\t}\r\n\t.date-editor {\r\n\t\tpadding: 5px 10px;\r\n\t\tborder-radius: 2px;\r\n\t\tborder: 1px solid #CCC;\r\n\t}\r\n\t.date-editor:focus {\r\n\t\tborder-color: #20A0FF;\r\n\t}\r\n</style>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<input type=\"text\" class=\"date-editor\" placeholder=\"选择日期\" :disabled=\"disabled\" v-model=\"dateValue\" @focus=\"focus\" @blur=\"blur\">\r\n\t\t<calendar :show-date-picker.sync=\"showDatePicker\" :date-value.sync=\"dateValue\" v-if=\"showDatePicker\" transition=\"calendar\"></calendar>\r\n\t</div>\r\n</template>\r\n\r\n<script>\r\n\timport calendar from \"../src/components/calendar.vue\"\r\n\r\n\texport default {\r\n\t\tdata() {\r\n\t\t\treturn {\r\n\t\t\t\tshowDatePicker: false,\r\n\t\t\t\tdateValue: \"\",\r\n\t\t\t\tdisabled: false\r\n\t\t\t}\r\n\t\t},\r\n\t\tcomponents: {\r\n\t\t\tcalendar\r\n\t\t},\r\n\t\tmethods: {\r\n\t\t\tfocus() {\r\n\t\t\t\tthis.showDatePicker = true\r\n\r\n\t\t\t\tthis.disabled = true\r\n\t\t\t},\r\n\t\t\tblur() {\r\n\t\t\t\tthis.disabled = false\r\n\t\t\t},\r\n\t\t\tcreateDateText() {\r\n\t\t\t\tlet date = new Date()\r\n\t\t\t\tlet year = date.getFullYear()\r\n\t\t\t\tlet month = date.getMonth() + 1\r\n\t\t\t\tlet day = date.getDate()\r\n\r\n\t\t\t\tlet str = `${year}/${month}/${day}`\r\n\r\n\t\t\t\tthis.dateText = str.replace(/\\b(\\w)\\b/g, \"0$1\")\r\n\t\t\t}\r\n\t\t},\r\n\t\tready() {\r\n\t\t\t//this.createDateText()\r\n\t\t}\r\n\t}\r\n</script>"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "\n.container {\n\twidth: 300px;\n\tmargin: 50px auto;\n\tposition: relative;\n}\n.date-editor {\n\tpadding: 5px 10px;\n\tborder-radius: 2px;\n\tborder: 1px solid #CCC;\n}\n.date-editor:focus {\n\tborder-color: #20A0FF;\n}\n", "", {"version":3,"sources":["/./src/app.vue?1db968d2"],"names":[],"mappings":";AACA;CACA,aAAA;CACA,kBAAA;CACA,mBAAA;CACA;AACA;CACA,kBAAA;CACA,mBAAA;CACA,uBAAA;CACA;AACA;CACA,sBAAA;CACA","file":"app.vue","sourcesContent":["<style>\r\n\t.container {\r\n\t\twidth: 300px;\r\n\t\tmargin: 50px auto;\r\n\t\tposition: relative;\r\n\t}\r\n\t.date-editor {\r\n\t\tpadding: 5px 10px;\r\n\t\tborder-radius: 2px;\r\n\t\tborder: 1px solid #CCC;\r\n\t}\r\n\t.date-editor:focus {\r\n\t\tborder-color: #20A0FF;\r\n\t}\r\n</style>\r\n\r\n<template>\r\n\t<div class=\"container\">\r\n\t\t<input type=\"text\" class=\"date-editor\" placeholder=\"选择日期\" readonly v-model=\"dateValue\" @focus=\"showDatePicker = true\">\r\n\t\t<calendar :show-date-picker.sync=\"showDatePicker\" :date-value.sync=\"dateValue\" v-if=\"showDatePicker\" transition=\"calendar\"></calendar>\r\n\t</div>\r\n</template>\r\n\r\n<script>\r\n\timport calendar from \"../src/components/calendar.vue\"\r\n\r\n\texport default {\r\n\t\tdata() {\r\n\t\t\treturn {\r\n\t\t\t\tshowDatePicker: false,\r\n\t\t\t\tdateValue: \"\",\r\n\t\t\t\tdisabled: false\r\n\t\t\t}\r\n\t\t},\r\n\t\tcomponents: {\r\n\t\t\tcalendar\r\n\t\t},\r\n\t\tmethods: {\r\n\t\t\tcreateDateText() {\r\n\t\t\t\tlet date = new Date()\r\n\t\t\t\tlet year = date.getFullYear()\r\n\t\t\t\tlet month = date.getMonth() + 1\r\n\t\t\t\tlet day = date.getDate()\r\n\r\n\t\t\t\tlet str = `${year}/${month}/${day}`\r\n\r\n\t\t\t\tthis.dateText = str.replace(/\\b(\\w)\\b/g, \"0$1\")\r\n\t\t\t}\r\n\t\t},\r\n\t\tready() {\r\n\t\t\t//this.createDateText()\r\n\t\t}\r\n\t}\r\n</script>"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -11043,14 +11043,6 @@
 			calendar: _calendar2.default
 		},
 		methods: {
-			focus: function focus() {
-				this.showDatePicker = true;
-	
-				this.disabled = true;
-			},
-			blur: function blur() {
-				this.disabled = false;
-			},
 			createDateText: function createDateText() {
 				var date = new Date();
 				var year = date.getFullYear();
@@ -11358,7 +11350,7 @@
 /* 19 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<div class=\"container\">\n\t<input type=\"text\" class=\"date-editor\" placeholder=\"选择日期\" :disabled=\"disabled\" v-model=\"dateValue\" @focus=\"focus\" @blur=\"blur\">\n\t<calendar :show-date-picker.sync=\"showDatePicker\" :date-value.sync=\"dateValue\" v-if=\"showDatePicker\" transition=\"calendar\"></calendar>\n</div>\n";
+	module.exports = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n<div class=\"container\">\n\t<input type=\"text\" class=\"date-editor\" placeholder=\"选择日期\" readonly v-model=\"dateValue\" @focus=\"showDatePicker = true\">\n\t<calendar :show-date-picker.sync=\"showDatePicker\" :date-value.sync=\"dateValue\" v-if=\"showDatePicker\" transition=\"calendar\"></calendar>\n</div>\n";
 
 /***/ }
 /******/ ]);
