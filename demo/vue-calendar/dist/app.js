@@ -11216,7 +11216,6 @@
 			getCal: function getCal(month) {
 				var dates = [];
 	
-				console.log(this.date);
 				var years = this.date.getFullYear();
 				var months = this.date.getMonth();
 	
@@ -11314,15 +11313,9 @@
 			},
 			selectDate: function selectDate(value) {
 				var date = new Date(this.date.getFullYear(), this.date.getMonth(), value);
-				var dateString = date.toLocaleDateString();
 	
-				if (dateString.match(/[\u4e00-\u9fff]/)) {
-					dateString = dateString.replace(/[\u4e00-\u9fff]/g, "/").replace(/\/$/, "");
-				} else {
-					dateString = dateString.replace(/\//g, "-");
-				}
+				this.dateValue = (date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()).replace(/\b(\w)\b/g, "0$1");
 	
-				this.dateValue = dateString.replace(/\b(\w)\b/g, "0$1");
 				this.time = date.getTime();
 	
 				this.showDatePicker = false;
