@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>模板引擎</title>
+<style>
+* {
+	padding: 0;
+	margin: 0;
+	font-family: "微软雅黑";
+}
+body {
+	padding-top: 20px;
+}
+h1 {
+	margin-bottom: 20px;
+}
+ul {
+	padding-left: 20px;
+	margin-bottom: 20px;
+}
+textarea, button, div {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 30px;
+}
+textarea {
+	width: 500px;
+	min-height: 200px;
+	padding: 10px;
+	resize: none;
+}
+button {
+	width: 80px;
+	line-height: 25px;
+	cursor: pointer;
+}
+div {
+	width: 300px;
+	min-height: 200px;
+	padding: 10px;
+	border: 1px dashed #CCC;
+}
+</style>
+</head>
+
+<body>
+	<textarea>
+		<h1>{{date | date}}</h1>
+		{{if dahai}}
+		<ul>
+			{{ each fictions value index}}
+				<li>{{value.author}} : {{value.title}}</li>
+			{{ /each }}
+		</ul>
+		{{/if}}
+	</textarea>
+	<button class="btn">输出</button>
+	<div class="result"></div>
+
+	<script src="template.js"></script>
+	<script>
+	const data = {
+		date: 1476779654616,
+		//posts: "123"
+		fictions: [{
+			"title": "最强弃少",
+			"author": "鹅是老五"
+		},{
+			"title": "武神空间",
+			"author": "傅啸尘"
+		},{
+			"title": "武极天下",
+			"author": "蚕茧里的牛"
+		},{
+			"title": "天下枭雄",
+			"author": "高月"
+		}],
+		dahai: "大海无量",
+		value: '<span style="color:#F00">hello world!</span>'
+	}
+
+	const btn = document.querySelector(".btn"),
+		result = document.querySelector(".result")
+
+	btn.addEventListener("click", () => {
+		result.innerHTML = template("textarea", data)
+	})
+
+	template.config("openTag", "{{")
+	template.config("closeTag", "}}")
+
+	template.filter("date", (value, ... argv) => {
+		console.log(argv)
+
+		return new Date(value).toLocaleDateString()
+	})
+</script>
+</body>
+</html>
