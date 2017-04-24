@@ -1,6 +1,6 @@
 /*!
  * This file is created by hanyang
- * updated_at: Mon, 24 Apr 2017 09:31:16 GMT
+ * updated_at: Mon, 24 Apr 2017 09:45:37 GMT
  */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -7596,22 +7596,30 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 			target.style.transition = "none";
 
-			target.time = Date.now();
-			target.max = (this.length - 1) * this.width;
+			this.time = Date.now();
+			this.max = (this.length - 1) * this.width;
 
-			target.startX = e.touches[0].clientX;
-			target.startY = e.touches[0].clientY;
+			this.startX = e.touches[0].clientX;
+			this.startY = e.touches[0].clientY;
 
 			this.$emit("start");
 		},
 		touchmove: function touchmove(e) {
-			var target = e.currentTarget;
-			var touch = e.touches[0];
-			var max = target.max;
-			var offset = this.offset;
+			var _this = this;
 
-			var x = touch.clientX - target.startX;
-			var y = touch.clientY - target.startY;
+			requestAnimationFrame(function () {
+				_this.touchmoveRAF(e);
+			});
+		},
+		touchmoveRAF: function touchmoveRAF(e) {
+			//console.log(e)
+			var target = this.$refs.touchWrapper; //e.currentTarget
+			var touch = e.touches[0];
+
+			var x = touch.clientX - this.startX;
+			var y = touch.clientY - this.startY;
+			var max = this.max;
+			var offset = this.offset;
 
 			// 判断用户手势动作
 			if (typeof this.isX === "undefined") {
@@ -7622,36 +7630,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				// 向左滑动
 				if (x < 0) {
 					if (Math.abs(x) + Math.abs(offset) > max) {
-						requestAnimationFrame(function () {
-							target.style.transform = "translate3d(-" + (Math.abs(x) / 4 + Math.abs(offset)) + "px, 0, 0)";
-						});
+						target.style.transform = "translate3d(-" + (Math.abs(x) / 4 + Math.abs(offset)) + "px, 0, 0)";
 
 						e.preventDefault();
 
 						return;
 					}
 
-					requestAnimationFrame(function () {
-						target.style.transform = "translate3d(" + (x + -offset) + "px, 0, 0)";
-					});
+					target.style.transform = "translate3d(" + (x + -offset) + "px, 0, 0)";
 
 					this.$emit("move", x + -offset);
 				} else {
 					var result = -(offset - x);
 
 					if (result > 0) {
-						requestAnimationFrame(function () {
-							target.style.transform = "translate3d(" + x / 4 + "px, 0, 0)";
-						});
+						target.style.transform = "translate3d(" + x / 4 + "px, 0, 0)";
 
 						e.preventDefault();
 
 						return;
 					}
 
-					requestAnimationFrame(function () {
-						target.style.transform = "translate3d(" + result + "px, 0, 0)";
-					});
+					target.style.transform = "translate3d(" + result + "px, 0, 0)";
 
 					this.$emit("move", result);
 				}
@@ -7663,12 +7663,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var target = e.currentTarget;
 			var touch = e.changedTouches[0];
 			var offset = this.offset;
-			var currentOffset = target.startX - touch.clientX;
-			var max = target.max;
-			var time = Date.now() - target.time;
+			var currentOffset = this.startX - touch.clientX;
+			var max = this.max;
+			var time = Date.now() - this.time;
 
-			var x = touch.clientX - target.startX;
-			var y = touch.clientY - target.startY;
+			var x = touch.clientX - this.startX;
+			var y = touch.clientY - this.startY;
 
 			if (!this.isX) {
 				delete this.isX;
@@ -7716,14 +7716,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			}
 		},
 		setTransform: function setTransform(target, direction) {
-			var _this = this;
+			var _this2 = this;
 
 			direction ? this.index++ : this.index--;
 
 			this.offset = this.index * this.width;
 
 			requestAnimationFrame(function () {
-				target.style.transform = "translateX(" + -_this.width * _this.index + "px)";
+				target.style.transform = "translateX(" + -_this2.width * _this2.index + "px)";
 			});
 
 			this.$emit("end", this.index);
@@ -10131,6 +10131,7 @@ if (false) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
+    ref: "touchWrapper",
     style: ({
       width: _vm.length * _vm.width + 'px',
       transform: 'translateX(-' + _vm.width * _vm.index + 'px) translateZ(0)'
