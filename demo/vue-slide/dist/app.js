@@ -1,6 +1,6 @@
 /*!
  * This file is created by hanyang
- * updated_at: Mon, 24 Apr 2017 08:43:50 GMT
+ * updated_at: Mon, 24 Apr 2017 08:55:34 GMT
  */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -207,7 +207,7 @@ function toComment(sourceMap) {
   return '/*# ' + data + ' */';
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11).Buffer))
 
 /***/ }),
 /* 2 */
@@ -467,7 +467,7 @@ __webpack_require__(23)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(16),
+  __webpack_require__(7),
   /* template */
   __webpack_require__(20),
   /* scopeId */
@@ -7330,7 +7330,7 @@ setTimeout(function () {
 
 /* harmony default export */ __webpack_exports__["a"] = (Vue$2);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(13), __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(16), __webpack_require__(3)))
 
 /***/ }),
 /* 6 */
@@ -7346,11 +7346,391 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 new __WEBPACK_IMPORTED_MODULE_0_vue__["a" /* default */]({
 	el: "#app",
-	render: h => h(__WEBPACK_IMPORTED_MODULE_1__app_vue___default.a)
-})
+	render: function render(h) {
+		return h(__WEBPACK_IMPORTED_MODULE_1__app_vue___default.a);
+	}
+});
 
 /***/ }),
 /* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_slide__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_slide___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_slide__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	data: function data() {
+		return {
+			imgs: ["./images/4eafaa70ly1fe80ipjpdkj22c02c07wh.jpg", "./images/5dad5135ly1fewkv62lz5j21ul11gkh4.jpg", "./images/6a3f5a25gy1fewugbrd06j20qp0qrgre.jpg", "./images/6ca647dcly1fewdrgbjaxj20k0183qa0.jpg", "./images/60a3704aly1fewsiubi4lj21w02d0hdt.jpg", "./images/00659XvZgy1fevofjc90zj31901o0x6r.jpg", "./images/6106a4f0ly1feww7tar4lj20ro0zkavl.jpg", "./images/734235e7gy1fepy8mqj3uj20yi1a04qq.jpg", "./images/734235e7gy1fepy9s952vj20yi1a04qq.jpg"],
+			index: 0,
+			slideStatus: false
+		};
+	},
+
+	components: {
+		slide: __WEBPACK_IMPORTED_MODULE_0__components_slide___default.a
+	},
+	created: function created() {
+		var value = window.innerWidth;
+		var deviceWidth = Math.min(640, value);
+
+		document.documentElement.style.fontSize = deviceWidth / 7.5 + "px";
+	},
+
+	methods: {
+		showImg: function showImg(index) {
+			this.index = index;
+
+			this.slideStatus = true;
+		},
+		hiddenImg: function hiddenImg() {
+			this.slideStatus = false;
+		}
+	}
+});
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__slide_base__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__slide_base___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__slide_base__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	props: {
+		imgs: {
+			type: Array,
+			required: true
+		},
+		currentIndex: {
+			type: Number,
+			default: 0
+		}
+	},
+	data: function data() {
+		return {
+			index: this.currentIndex
+		};
+	},
+
+	components: {
+		slideBase: __WEBPACK_IMPORTED_MODULE_0__slide_base___default.a
+	},
+	methods: {
+		load: function load(e) {
+			var target = e.target;
+			var viewportHeight = window.innerHeight;
+
+			if (target.height > viewportHeight) {
+				target.parentNode.classList.add("no-flex");
+			}
+		},
+		hiddenImg: function hiddenImg() {
+			this.$emit("hiddenImg");
+		},
+		changeIndex: function changeIndex(value) {
+			this.index = value;
+		}
+	}
+});
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	props: {
+		length: {
+			type: Number,
+			required: true
+		},
+		currentIndex: {
+			type: Number,
+			default: 0
+		}
+	},
+	data: function data() {
+		return {
+			width: window.innerWidth,
+			index: this.currentIndex
+		};
+	},
+
+	computed: {
+		offset: function offset() {
+			return this.width * this.index;
+		}
+	},
+	watch: {
+		currentIndex: function currentIndex(value) {
+			this.index = value;
+		}
+	},
+	methods: {
+		touchstart: function touchstart(e) {
+			var target = e.currentTarget;
+
+			target.style.transition = "none";
+
+			target.time = Date.now();
+			target.max = (this.length - 1) * this.width;
+
+			target.startX = e.touches[0].clientX;
+			target.startY = e.touches[0].clientY;
+
+			this.$emit("start");
+		},
+		touchmove: function touchmove(e) {
+			var target = e.currentTarget;
+			var touch = e.touches[0];
+			var max = target.max;
+			var offset = this.offset;
+
+			var x = touch.clientX - target.startX;
+			var y = touch.clientY - target.startY;
+
+			// 判断用户手势动作
+			if (typeof this.isX === "undefined") {
+				this.isX = Math.abs(y) / Math.abs(x) < 1;
+			}
+
+			if (this.isX) {
+				// 向左滑动
+				if (x < 0) {
+					if (Math.abs(x) + Math.abs(offset) > max) {
+						requestAnimationFrame(function () {
+							target.style.transform = "translateX(-" + (Math.abs(x) / 4 + Math.abs(offset)) + "px)";
+						});
+
+						e.preventDefault();
+
+						return;
+					}
+
+					requestAnimationFrame(function () {
+						target.style.transform = "translateX(" + (x + -offset) + "px)";
+					});
+
+					this.$emit("move", x + -offset);
+				} else {
+					var result = -(offset - x);
+
+					if (result > 0) {
+						requestAnimationFrame(function () {
+							target.style.transform = "translateX(" + x / 4 + "px)";
+						});
+
+						e.preventDefault();
+
+						return;
+					}
+
+					requestAnimationFrame(function () {
+						target.style.transform = "translateX(" + result + "px)";
+					});
+
+					this.$emit("move", result);
+				}
+
+				e.preventDefault();
+			}
+		},
+		touchend: function touchend(e) {
+			var target = e.currentTarget;
+			var touch = e.changedTouches[0];
+			var offset = this.offset;
+			var currentOffset = target.startX - touch.clientX;
+			var max = target.max;
+			var time = Date.now() - target.time;
+
+			var x = touch.clientX - target.startX;
+			var y = touch.clientY - target.startY;
+
+			if (!this.isX) {
+				delete this.isX;
+
+				return;
+			}
+
+			delete this.isX;
+
+			target.style.transition = "all .3s";
+
+			if (currentOffset > 0 && offset === max) {
+				requestAnimationFrame(function () {
+					target.style.transform = "translateX(" + -max + "px)";
+				});
+
+				return;
+			}
+
+			if (currentOffset < 0 && offset === 0) {
+				requestAnimationFrame(function () {
+					target.style.transform = "translateX(0)";
+				});
+
+				return;
+			}
+
+			// 滑动速度快
+			if (time < 100) {
+				if (currentOffset > 0) {
+					this.setTransform(target, 1);
+				} else {
+					this.setTransform(target);
+				}
+			} else {
+				if (Math.abs(currentOffset) >= this.width / 3) {
+					currentOffset > 0 ? this.setTransform(target, 1) : this.setTransform(target);
+				} else {
+					requestAnimationFrame(function () {
+						target.style.transform = "translateX(" + -offset + "px)";
+					});
+
+					this.$emit("end", this.index);
+				}
+			}
+		},
+		setTransform: function setTransform(target, direction) {
+			var _this = this;
+
+			direction ? this.index++ : this.index--;
+
+			this.offset = this.index * this.width;
+
+			requestAnimationFrame(function () {
+				target.style.transform = "translateX(" + -_this.width * _this.index + "px)";
+			});
+
+			this.$emit("end", this.index);
+			this.$emit("changeIndex", this.index);
+		}
+	}
+});
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7471,7 +7851,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7485,9 +7865,9 @@ function fromByteArray (uint8) {
 
 
 
-var base64 = __webpack_require__(7)
-var ieee754 = __webpack_require__(11)
-var isArray = __webpack_require__(12)
+var base64 = __webpack_require__(10)
+var ieee754 = __webpack_require__(14)
+var isArray = __webpack_require__(15)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -9268,7 +9648,7 @@ function isnan (val) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(true);
@@ -9282,7 +9662,7 @@ exports.push([module.i, "\n.slide-container {\r\n\tposition: fixed;\r\n\ttop: 0;
 
 
 /***/ }),
-/* 10 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(true);
@@ -9296,7 +9676,7 @@ exports.push([module.i, "\nbody, div, p, header {\r\n\tpadding: 0;\r\n\tmargin: 
 
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -9386,7 +9766,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -9397,7 +9777,7 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -9583,7 +9963,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -9592,7 +9972,7 @@ __webpack_require__(22)
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(17),
+  __webpack_require__(8),
   /* template */
   __webpack_require__(19),
   /* scopeId */
@@ -9621,12 +10001,12 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Component = __webpack_require__(0)(
   /* script */
-  __webpack_require__(18),
+  __webpack_require__(9),
   /* template */
   __webpack_require__(21),
   /* scopeId */
@@ -9652,394 +10032,6 @@ if (false) {(function () {
 })()}
 
 module.exports = Component.exports
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_slide__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_slide___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_slide__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-	data() {
-		return {
-			imgs: [
-				"./images/4eafaa70ly1fe80ipjpdkj22c02c07wh.jpg",
-				"./images/5dad5135ly1fewkv62lz5j21ul11gkh4.jpg",
-				"./images/6a3f5a25gy1fewugbrd06j20qp0qrgre.jpg",
-				"./images/6ca647dcly1fewdrgbjaxj20k0183qa0.jpg",
-				"./images/60a3704aly1fewsiubi4lj21w02d0hdt.jpg",
-				"./images/00659XvZgy1fevofjc90zj31901o0x6r.jpg",
-				"./images/6106a4f0ly1feww7tar4lj20ro0zkavl.jpg",
-				"./images/734235e7gy1fepy8mqj3uj20yi1a04qq.jpg",
-				"./images/734235e7gy1fepy9s952vj20yi1a04qq.jpg",
-				],
-			index: 0,
-			slideStatus: false
-		}
-	},
-	components: {
-		slide: __WEBPACK_IMPORTED_MODULE_0__components_slide___default.a
-	},
-	created() {
-		const value = window.innerWidth
-		const deviceWidth = Math.min(640, value)
-
-		document.documentElement.style.fontSize = `${deviceWidth / 7.5}px`
-	},
-	methods: {
-		showImg(index) {
-			this.index = index
-
-			this.slideStatus = true
-		},
-		hiddenImg() {
-			this.slideStatus = false
-		}
-	}
-});
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__slide_base__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__slide_base___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__slide_base__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-	props: {
-		imgs: {
-			type: Array,
-			required: true
-		},
-		currentIndex: {
-			type: Number,
-			default: 0,
-		}
-	},
-	data() {
-		return {
-			index: this.currentIndex
-		}
-	},
-	components: {
-		slideBase: __WEBPACK_IMPORTED_MODULE_0__slide_base___default.a
-	},
-	methods: {
-		load(e) {
-			const target = e.target
-			const viewportHeight = window.innerHeight
-
-			if (target.height > viewportHeight) {
-				target.parentNode.classList.add("no-flex")
-			}
-		},
-		hiddenImg() {
-			this.$emit("hiddenImg")
-		},
-		changeIndex(value) {
-			this.index = value
-		}
-	}
-});
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-	props: {
-		length: {
-			type: Number,
-			required: true
-		},
-		currentIndex: {
-			type: Number,
-			default: 0,
-		}
-	},
-	data() {
-		return {
-			width: window.innerWidth,
-			index: this.currentIndex
-		}
-	},
-	computed: {
-		offset() {
-			return this.width * this.index
-		}
-	},
-	watch: {
-		currentIndex(value) {
-			this.index = value
-		}
-	},
-	methods: {
-		touchstart(e) {
-			const target = e.currentTarget
-
-			target.style.transition = "none"
-
-			target.time = Date.now()
-			target.max = (this.length - 1) * this.width
-
-			target.startX = e.touches[0].clientX
-			target.startY = e.touches[0].clientY
-
-			this.$emit("start")
-		},
-		touchmove(e) {
-			const target = e.currentTarget
-			const touch = e.touches[0]
-			const max = target.max
-			const offset = this.offset
-
-			const x = touch.clientX - target.startX
-			const y = touch.clientY - target.startY
-
-			// 判断用户手势动作
-			if (typeof this.isX === "undefined") {
-				this.isX = Math.abs(y) / Math.abs(x) < 1
-			}
-
-			if (this.isX) {
-				// 向左滑动
-				if (x < 0) {
-					if (Math.abs(x) + Math.abs(offset) > max) {
-						requestAnimationFrame(() => {
-							target.style.transform = `translateX(-${(Math.abs(x) / 4) + Math.abs(offset)}px)`
-						})
-
-						e.preventDefault()
-
-						return
-					}
-
-					requestAnimationFrame(() => {
-						target.style.transform = `translateX(${x + - offset}px)`
-					})
-
-					this.$emit("move", x + - offset)
-				} else {
-					const result = - (offset - x)
-
-					if (result > 0) {
-						requestAnimationFrame(() => {
-							target.style.transform = `translateX(${x / 4}px)`
-						})
-
-						e.preventDefault()
-
-						return
-					}
-
-					requestAnimationFrame(() => {
-						target.style.transform = `translateX(${result}px)`
-					})
-
-					this.$emit("move", result)
-				}
-
-				e.preventDefault()
-
-			}
-		},
-		touchend(e) {
-			const target = e.currentTarget
-			const touch = e.changedTouches[0]
-			const offset = this.offset
-			const currentOffset = target.startX - touch.clientX
-			const max = target.max
-			const time = Date.now() - target.time
-
-			const x = touch.clientX - target.startX
-			const y = touch.clientY - target.startY
-
-
-			if (! this.isX) {
-				delete this.isX
-
-				return
-			}
-
-			delete this.isX
-
-			target.style.transition = "all .3s"
-
-			if (currentOffset > 0 && offset === max) {
-				requestAnimationFrame(() => {
-					target.style.transform = `translateX(${-max}px)`
-				})
-
-				return
-			}
-
-			if (currentOffset < 0 && offset === 0) {
-				requestAnimationFrame(() => {
-					target.style.transform = `translateX(0)`
-				})
-
-				return
-			}
-
-			// 滑动速度快
-			if (time < 100) {
-				if (currentOffset > 0) {
-					this.setTransform(target, 1)
-				} else {
-					this.setTransform(target)
-				}
-			} else {
-				if (Math.abs(currentOffset) >= this.width / 3) {
-					currentOffset > 0 ? this.setTransform(target, 1) : this.setTransform(target)
-
-				} else {
-					requestAnimationFrame(() => {
-						target.style.transform = `translateX(${- offset}px)`
-					})
-
-					this.$emit("end", this.index)
-				}
-			}
-		},
-		setTransform(target, direction) {
-			direction ? this.index++ : this.index--
-
-			this.offset = this.index * this.width
-
-			requestAnimationFrame(() => {
-				target.style.transform = `translateX(${- this.width * this.index}px)`
-			})
-
-			this.$emit("end", this.index)
-			this.$emit("changeIndex", this.index)
-		}
-	}
-});
 
 
 /***/ }),
@@ -10162,7 +10154,7 @@ if (false) {
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(9);
+var content = __webpack_require__(12);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
@@ -10188,7 +10180,7 @@ if(false) {
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(10);
+var content = __webpack_require__(13);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
