@@ -1,6 +1,6 @@
 /*!
  * This file is created by hanyang
- * updated_at: Mon, 24 Apr 2017 09:08:23 GMT
+ * updated_at: Mon, 24 Apr 2017 09:31:16 GMT
  */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -7623,7 +7623,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				if (x < 0) {
 					if (Math.abs(x) + Math.abs(offset) > max) {
 						requestAnimationFrame(function () {
-							target.style.transform = "translateX(-" + (Math.abs(x) / 4 + Math.abs(offset)) + "px)";
+							target.style.transform = "translate3d(-" + (Math.abs(x) / 4 + Math.abs(offset)) + "px, 0, 0)";
 						});
 
 						e.preventDefault();
@@ -7632,7 +7632,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					}
 
 					requestAnimationFrame(function () {
-						target.style.transform = "translateX(" + (x + -offset) + "px)";
+						target.style.transform = "translate3d(" + (x + -offset) + "px, 0, 0)";
 					});
 
 					this.$emit("move", x + -offset);
@@ -7641,7 +7641,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 					if (result > 0) {
 						requestAnimationFrame(function () {
-							target.style.transform = "translateX(" + x / 4 + "px)";
+							target.style.transform = "translate3d(" + x / 4 + "px, 0, 0)";
 						});
 
 						e.preventDefault();
@@ -7650,7 +7650,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					}
 
 					requestAnimationFrame(function () {
-						target.style.transform = "translateX(" + result + "px)";
+						target.style.transform = "translate3d(" + result + "px, 0, 0)";
 					});
 
 					this.$emit("move", result);
